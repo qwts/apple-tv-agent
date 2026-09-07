@@ -8,8 +8,8 @@ The implementation plans are maintained here and tracked as [GitHub issues](http
 | [002: Create the Python package and JSON CLI contract](002-package-contract.md) | P0 | 001 | Complete |
 | [003: Implement discovery, durable identity and device selection](003-discovery-registry.md) | P0 | 002 | Complete |
 | [004: Implement native credentials and interactive pairing](004-credentials-pairing.md) | P0 | 003 | Complete |
-| [005: Implement bounded sessions, capabilities and status](005-session-status.md) | P0 | 004 | In review |
-| [006: Implement navigation, playback, power and volume](006-core-controls.md) | P0 | 005 | Open |
+| [005: Implement bounded sessions, capabilities and status](005-session-status.md) | P0 | 004 | Complete |
+| [006: Implement navigation, playback, power and volume](006-core-controls.md) | P0 | 005 | In review |
 | [007: Implement installed-app launch and focused text input](007-apps-keyboard.md) | P1 | 006 | Open |
 | [008: Add actionable local diagnostics and recovery guidance](008-diagnostics.md) | P1 | 005 | Open |
 | [009: Author and package the portable Apple TV control skill](009-agent-skill.md) | P0 | 006, 007, 008 | Open |

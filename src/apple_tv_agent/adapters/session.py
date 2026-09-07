@@ -6,6 +6,7 @@ from functools import partial
 
 from pydantic import TypeAdapter, ValidationError
 
+from apple_tv_agent.controls import CORE_CONTROLS, dispatch
 from apple_tv_agent.discovery import resolve_identity
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import (
@@ -20,23 +21,7 @@ from apple_tv_agent.models import (
 from apple_tv_agent.ports import Credentials
 
 ACTION_FEATURES = {
-    Command.UP: "Up",
-    Command.DOWN: "Down",
-    Command.LEFT: "Left",
-    Command.RIGHT: "Right",
-    Command.SELECT: "Select",
-    Command.MENU: "Menu",
-    Command.HOME: "Home",
-    Command.PLAY: "Play",
-    Command.PAUSE: "Pause",
-    Command.STOP: "Stop",
-    Command.NEXT: "Next",
-    Command.PREVIOUS: "Previous",
-    Command.POWER_ON: "TurnOn",
-    Command.POWER_OFF: "TurnOff",
-    Command.VOLUME_UP: "VolumeUp",
-    Command.VOLUME_DOWN: "VolumeDown",
-    Command.VOLUME_SET: "SetVolume",
+    **{command: spec[2] for command, spec in CORE_CONTROLS.items()},
     Command.APPS_LIST: "AppList",
     Command.APPS_LAUNCH: "LaunchApp",
     Command.KEYBOARD_TYPE: "TextAppend",
@@ -68,9 +53,16 @@ def public_error(error):
 class OwnedSession:
     def __init__(self, adapter):
         self.adapter = adapter
+        self.dispatched = False
         self.facade = None
         self.http = None
         self.closers = []
+
+    async def act(self, request):
+        try:
+            return await dispatch(self, request)
+        except Exception as error:
+            raise public_error(error) from None
 
     async def connect(self, device, vault, end):
         try:

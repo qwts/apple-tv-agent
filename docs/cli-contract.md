@@ -1,6 +1,6 @@
 # CLI and JSON contract v1
 
-Issue [002](../issues/002-package-contract.md) establishes the installable contract foundation. Issue [003](../issues/003-discovery-registry.md) adds live discovery and local registry list/alias/default operations. Issue [004](../issues/004-credentials-pairing.md) adds interactive pairing and local credential removal. Issue [005](../issues/005-session-status.md) implements status/capabilities; remaining control/diagnostic commands return `FEATURE_UNAVAILABLE` with `details.reason = not_implemented`. Noninteractive pairing returns `INTERACTIVE_REQUIRED` first. The test-only fake adapter is dependency-injected; there is no CLI option that returns simulated device success.
+Issue [002](../issues/002-package-contract.md) establishes the installable contract foundation. Issue [003](../issues/003-discovery-registry.md) adds live discovery and local registry list/alias/default operations. Issue [004](../issues/004-credentials-pairing.md) adds interactive pairing and local credential removal. Issue [005](../issues/005-session-status.md) implements status/capabilities; issue [006](../issues/006-core-controls.md) implements core controls; remaining app/keyboard/diagnostic commands return `FEATURE_UNAVAILABLE` with `details.reason = not_implemented`. Noninteractive pairing returns `INTERACTIVE_REQUIRED` first. The test-only fake adapter is dependency-injected; there is no CLI option that returns simulated device success.
 
 Parsing arguments and registry list/alias/default commands do not load pyatv or access a native vault. Forget uses the native vault but sends no network commands. Discovery reads the LAN but does not pair or issue control commands. The separate [transport probe](compatibility.md) remains the opt-in hardware pairing/control feasibility tool.
 
@@ -81,13 +81,13 @@ Every envelope contains these six keys; missing keys are invalid:
 
 The machine-readable [response-v1.json](../schemas/response-v1.json) is generated from [models.py](../src/apple_tv_agent/models.py), checked for consistency in tests, validated with an independent JSON Schema implementation, and bundled inside the wheel. Regenerate it with `uv run --locked --no-sync python tools/generate_schema.py` after deliberate model changes. Unknown object fields are rejected by typed payload models and the schema.
 
-Current production response to `apple-tv-agent status`:
+Example response to the currently unimplemented `apple-tv-agent doctor`:
 
 ```json
-{"schema_version":1,"ok":false,"command":"status","device_id":null,"data":null,"error":{"code":"FEATURE_UNAVAILABLE","message":"This feature is currently unavailable.","retryable":false,"details":{"reason":"not_implemented"}}}
+{"schema_version":1,"ok":false,"command":"doctor","device_id":null,"data":null,"error":{"code":"FEATURE_UNAVAILABLE","message":"This feature is currently unavailable.","retryable":false,"details":{"reason":"not_implemented"}}}
 ```
 
-Device and app names are untrusted strings, not instructions. Observation timestamps require timezone information; missing status values are null. `ActionData` has `outcome` (`confirmed`, `sent`, or `unknown`) and `observed_state` (a full status observation or null). A confirmed outcome requires a nonnull observation; services must additionally verify that the observation matches the requested effect. Errors after possible dispatch use `details.outcome = unknown`; future services must track dispatch, as the probe already does. The contract layer never retries mutations.
+Device and app names are untrusted strings, not instructions. Observation timestamps require timezone information; missing status values are null. `ActionData` has `outcome` (`confirmed`, `sent`, or `unknown`) and `observed_state` (a full status observation or null). A confirmed outcome requires a nonnull observation; services must additionally verify that the observation matches the requested effect. Errors after possible dispatch use `details.outcome = unknown`; core control services track this boundary. The contract layer never retries mutations.
 
 ## Error and exit mapping
 
@@ -119,4 +119,4 @@ Issue 003 implements registry/discovery; 004 implements native credentials/pairi
 
 ## Discovery and registry implementation
 
-`discover`, `devices list`, `devices alias`, and `devices default` now execute their services. See [registry usage and recovery](registry.md). Pairing and `devices forget` are implemented; see [pairing and credential recovery](pairing.md). Status/capabilities are implemented; see [session behavior](sessions.md). Remaining control commands return `FEATURE_UNAVAILABLE` with `reason=not_implemented`; noninteractive pairing still returns `INTERACTIVE_REQUIRED`. Discovery never registers a device; interactive pairing explicitly registers its selected candidate.
+`discover`, `devices list`, `devices alias`, and `devices default` now execute their services. See [registry usage and recovery](registry.md). Pairing and `devices forget` are implemented; see [pairing and credential recovery](pairing.md). Status/capabilities are implemented; see [session behavior](sessions.md). Core controls are implemented; see [control mappings and outcomes](controls.md). Remaining app/keyboard/diagnostic commands return `FEATURE_UNAVAILABLE` with `reason=not_implemented`; noninteractive pairing still returns `INTERACTIVE_REQUIRED`. Discovery never registers a device; interactive pairing explicitly registers its selected candidate.

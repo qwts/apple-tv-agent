@@ -1,5 +1,6 @@
-"""Discovery and local registry operations; remaining device services are pending."""
+"""Route implemented discovery, registry, pairing, session and control commands."""
 
+from apple_tv_agent.controls import CORE_CONTROLS
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import AliasData, Command, DefaultData, DevicesData, DiscoveryData
 from apple_tv_agent.ports import CommandResult
@@ -14,17 +15,32 @@ class ContractService:
         self.pin_reader = pin_reader
 
     async def execute(self, request: Request) -> CommandResult:
-        if request.command in (Command.STATUS, Command.CAPABILITIES):
+        if (
+            request.command in (Command.STATUS, Command.CAPABILITIES)
+            or request.command in CORE_CONTROLS
+        ):
             from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
             from apple_tv_agent.credentials import NativeCredentialStore
             from apple_tv_agent.registry import DeviceRegistry
             from apple_tv_agent.sessions import SessionService
 
-            return await SessionService(
-                self.adapter or PyatvAdapter(),
-                self.registry or DeviceRegistry(),
-                self.vault or NativeCredentialStore(),
-            ).execute(request)
+            try:
+                service = SessionService(
+                    self.adapter or PyatvAdapter(),
+                    self.registry or DeviceRegistry(),
+                    self.vault or NativeCredentialStore(),
+                )
+            except Exception as error:
+                if request.command not in CORE_CONTROLS:
+                    raise
+                public = (
+                    error if isinstance(error, AgentError) else AgentError(ErrorCode.INTERNAL_ERROR)
+                )
+                raise AgentError(
+                    public.code,
+                    details={**public.details, "device_id": None, "outcome": "not_sent"},
+                ) from None
+            return await service.execute(request)
         if request.command in (Command.PAIR, Command.DEVICES_FORGET):
             from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
             from apple_tv_agent.credentials import NativeCredentialStore
