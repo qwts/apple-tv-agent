@@ -1,5 +1,6 @@
-"""Discovery and local registry operations; remaining device services are pending."""
+"""Route implemented discovery, registry, pairing, session and control commands."""
 
+from apple_tv_agent.controls import CORE_CONTROLS
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import AliasData, Command, DefaultData, DevicesData, DiscoveryData
 from apple_tv_agent.ports import CommandResult
@@ -14,7 +15,10 @@ class ContractService:
         self.pin_reader = pin_reader
 
     async def execute(self, request: Request) -> CommandResult:
-        if request.command in (Command.STATUS, Command.CAPABILITIES):
+        if (
+            request.command in (Command.STATUS, Command.CAPABILITIES)
+            or request.command in CORE_CONTROLS
+        ):
             from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
             from apple_tv_agent.credentials import NativeCredentialStore
             from apple_tv_agent.registry import DeviceRegistry

@@ -148,3 +148,7 @@ The new opt-in native-vault test passed an isolated write, fresh-process read an
 ## Production status/capabilities validation (issue 005)
 
 On 2026-09-07, macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: separate production CLI status and capability invocations connected to the registered reference TV using Keychain credentials and returned success JSON with empty stderr. Status observed playback `playing`. No re-pairing, playback or navigation action was sent. Windows 11 TV status/capability validation remains untested; simulated cross-platform tests are not a substitute for that hardware evidence.
+
+### Core-control implementation check (2026-09-07)
+
+On the same macOS 26.6.2 arm64 host, Python 3.14.7 and pyatv 0.18.0 reconnected with saved credentials. Production status reported off/idle; capabilities marked playback unavailable. `remote play` returned FEATURE_UNAVAILABLE with not_sent, retryable false and empty stderr. No control was dispatched. Successful production playback/power/volume effects and physical home/menu behavior remain untested, as does Windows 11 hardware. Automated control/session validation passes 338 tests with one native-vault opt-in skip; see [control semantics](controls.md).
