@@ -319,7 +319,7 @@ def test_discovery_and_registry_service_are_isolated(registry, capsys):
     assert result["data"]["default_device_id"] == device.device_id
     assert adapter.discover.await_count == 1
     with pytest.raises(AgentError) as error:
-        run(service.execute(Request(Command.STATUS)))
+        run(service.execute(Request(Command.PLAY)))
     assert error.value.code == ErrorCode.FEATURE_UNAVAILABLE
 
 

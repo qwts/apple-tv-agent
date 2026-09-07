@@ -14,6 +14,17 @@ class ContractService:
         self.pin_reader = pin_reader
 
     async def execute(self, request: Request) -> CommandResult:
+        if request.command in (Command.STATUS, Command.CAPABILITIES):
+            from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
+            from apple_tv_agent.credentials import NativeCredentialStore
+            from apple_tv_agent.registry import DeviceRegistry
+            from apple_tv_agent.sessions import SessionService
+
+            return await SessionService(
+                self.adapter or PyatvAdapter(),
+                self.registry or DeviceRegistry(),
+                self.vault or NativeCredentialStore(),
+            ).execute(request)
         if request.command in (Command.PAIR, Command.DEVICES_FORGET):
             from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
             from apple_tv_agent.credentials import NativeCredentialStore

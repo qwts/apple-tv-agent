@@ -37,6 +37,11 @@ def normalize(config):
 
 
 class PyatvAdapter:
+    def session(self):
+        from apple_tv_agent.adapters.session import OwnedSession
+
+        return OwnedSession(self)
+
     async def discover(self, *, host: str | None, timeout: float):
         loop = asyncio.get_running_loop()
         started = loop.time()

@@ -33,7 +33,7 @@ dev = [
 packages = ["src/apple_tv_agent"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "schemas", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md"]
+include = ["src", "schemas", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md"]
 
 [tool.ruff]
 target-version = "py312"
@@ -46,3 +46,4 @@ select = ["E4", "E7", "E9", "F", "I"]
 "schemas/response-v1.json" = "apple_tv_agent/response-v1.json"
 "docs/registry.md" = "apple_tv_agent/docs/registry.md"
 "docs/pairing.md" = "apple_tv_agent/docs/pairing.md"
+"docs/sessions.md" = "apple_tv_agent/docs/sessions.md"

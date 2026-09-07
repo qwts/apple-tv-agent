@@ -16,3 +16,4 @@ class Request:
     level: float | None = None
     network: bool = False
     text: str | None = field(default=None, repr=False)
+    deadline: float | None = field(default=None, repr=False)
