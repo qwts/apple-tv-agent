@@ -1,8 +1,8 @@
 # CLI and JSON contract v1
 
-Issue [002](../issues/002-package-contract.md) establishes an installable contract foundation. **Device services are not implemented yet.** Valid operational commands currently return `FEATURE_UNAVAILABLE` with `details.reason = not_implemented`. Noninteractive pairing returns `INTERACTIVE_REQUIRED` first. The test-only fake adapter is dependency-injected; there is no CLI option that returns simulated device success.
+Issue [002](../issues/002-package-contract.md) establishes the installable contract foundation. Issue [003](../issues/003-discovery-registry.md) adds live discovery and local registry list/alias/default operations. Other operational commands return `FEATURE_UNAVAILABLE` with `details.reason = not_implemented`. Noninteractive pairing returns `INTERACTIVE_REQUIRED` first. The test-only fake adapter is dependency-injected; there is no CLI option that returns simulated device success.
 
-The installable package does not connect to the TV, access a native vault, or load pyatv while parsing arguments. The separate [transport probe](compatibility.md) remains the opt-in hardware feasibility tool.
+Parsing arguments and local registry commands do not load pyatv or access a native vault. Discovery reads the LAN but does not pair or issue control commands. The separate [transport probe](compatibility.md) remains the opt-in hardware pairing/control feasibility tool.
 
 ## Install and validate
 
@@ -116,3 +116,7 @@ Success exits 0. `retryable` defaults to false and means a safe automatic retry,
 `Request` contains validated arguments; `ports.py` defines service, adapter, registry and credential-store protocols. Only future transport adapter modules will import pyatv. The default `ContractService` explicitly rejects unimplemented operations. Tests inject `FakeService` and a deterministic `FakeAdapter` to exercise success/error contracts without LAN access or secrets.
 
 Issue 003 implements registry/discovery; 004 implements native credentials/pairing; 005–008 implement device services and diagnostics. Issue 001 remains open for Windows 11 hardware, native-vault persistence and remaining feature semantics. This merge establishes a versioned development contract using the proven library APIs; it does not waive those hardware release gates.
+
+## Discovery and registry implementation
+
+`discover`, `devices list`, `devices alias`, and `devices default` now execute their services. See [registry usage and recovery](registry.md). Other device commands still return `FEATURE_UNAVAILABLE` with `reason=not_implemented`; noninteractive pairing still returns `INTERACTIVE_REQUIRED`. Discovery never registers a device; issue 004 will connect interactive pairing to the registration API.

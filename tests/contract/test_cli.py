@@ -180,7 +180,20 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
     factory.assert_not_called()
 
 
-@pytest.mark.parametrize("command", list(Command))
+@pytest.mark.parametrize(
+    "command",
+    [
+        c
+        for c in Command
+        if c
+        not in {
+            Command.DISCOVER,
+            Command.DEVICES_LIST,
+            Command.DEVICES_ALIAS,
+            Command.DEVICES_DEFAULT,
+        }
+    ],
+)
 def test_pending_services_are_explicitly_unavailable(command, monkeypatch, capsys):
     monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
     argv = command.value.split(".")
