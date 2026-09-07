@@ -13,7 +13,7 @@ from jsonschema import Draft202012Validator
 from pydantic import TypeAdapter, ValidationError
 
 from apple_tv_agent.cli import main, parse_request
-from apple_tv_agent.controls import CORE_CONTROLS
+from apple_tv_agent.controls import MUTATIONS
 from apple_tv_agent.errors import ERRORS, AgentError, ErrorCode
 from apple_tv_agent.models import (
     PAYLOADS,
@@ -188,7 +188,8 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
         for c in Command
         if c
         not in {
-            *CORE_CONTROLS,
+            *MUTATIONS,
+            Command.APPS_LIST,
             Command.STATUS,
             Command.CAPABILITIES,
             Command.PAIR,

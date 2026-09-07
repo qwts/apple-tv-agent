@@ -2,7 +2,7 @@
 
 import asyncio
 
-from apple_tv_agent.controls import CORE_CONTROLS
+from apple_tv_agent.controls import MUTATIONS
 from apple_tv_agent.discovery import select_device
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.locking import device_lock
@@ -16,8 +16,12 @@ class SessionService:
         self.adapter, self.registry, self.vault = adapter, registry, vault
 
     async def execute(self, request):
-        mutation = request.command in CORE_CONTROLS
-        if not mutation and request.command not in (Command.STATUS, Command.CAPABILITIES):
+        mutation = request.command in MUTATIONS
+        if not mutation and request.command not in (
+            Command.STATUS,
+            Command.CAPABILITIES,
+            Command.APPS_LIST,
+        ):
             raise AgentError(ErrorCode.FEATURE_UNAVAILABLE, details={"reason": "read_only_session"})
         loop = asyncio.get_running_loop()
         end = request.deadline if request.deadline is not None else loop.time() + request.timeout
@@ -52,6 +56,8 @@ class SessionService:
                                         if mutation
                                         else session.status()
                                         if request.command == Command.STATUS
+                                        else session.apps()
+                                        if request.command == Command.APPS_LIST
                                         else session.capabilities()
                                     )
                             except AgentError as error:

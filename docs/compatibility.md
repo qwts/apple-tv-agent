@@ -152,3 +152,7 @@ On 2026-09-07, macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: separate produ
 ### Core-control implementation check (2026-09-07)
 
 On the same macOS 26.6.2 arm64 host, Python 3.14.7 and pyatv 0.18.0 reconnected with saved credentials. Production status reported off/idle; capabilities marked playback unavailable. `remote play` returned FEATURE_UNAVAILABLE with not_sent, retryable false and empty stderr. No control was dispatched. Successful production playback/power/volume effects and physical home/menu behavior remain untested, as does Windows 11 hardware. Automated control/session validation passes 338 tests with one native-vault opt-in skip; see [control semantics](controls.md).
+
+### App listing and launch (2026-09-07)
+
+The reference macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0 host retrieved 28 launchable apps using saved credentials. A single launch of the exact installed Netflix bundle ID completed with sent and empty stderr. This confirms transport completion only; the visible foreground app was not independently confirmed. Intentional focused-field keyboard typing and Windows 11 hardware remain untested. Automated suite: 391 passed, one native-vault opt-in skip.
