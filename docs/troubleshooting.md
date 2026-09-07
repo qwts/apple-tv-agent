@@ -1,6 +1,6 @@
 # Diagnostics and recovery
 
-Run `apple-tv-agent doctor` in the same environment the agent uses. It reports package/Python/platform information, dependency versions and importability, virtual-environment context, native credential backend selection and registry readability. It does not print executable paths, device names, addresses, identifiers, credentials, input text, environment variables or raw exceptions.
+Run `apple-tv-agent doctor` in the same environment the agent uses. It reports package/Python/platform information, dependency versions against the exact runtime pins and importability, virtual-environment context, native credential backend selection and registry readability. It does not print executable paths, device names, addresses, identifiers, credentials, input text, environment variables or raw exceptions.
 
 A completed report exits 0 with `ok=true`, even when individual checks are fail or not_tested. Inspect `data.checks`; success means the report completed, not that the TV is controllable. Parser errors, overall deadline expiry and unexpected report failures retain the usual error envelopes and exit codes. If a foundational import needed to start the CLI is broken, doctor cannot run: recover the environment first using the locked setup in [cli-contract.md](cli-contract.md).
 

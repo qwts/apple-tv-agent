@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from apple_tv_agent.cli import main
-from apple_tv_agent.diagnostics import DoctorService
+from apple_tv_agent.diagnostics import DEPENDENCIES, DoctorService
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import Command
 from apple_tv_agent.registry import DeviceRegistry
@@ -24,7 +24,7 @@ def service(**overrides):
         ),
         vault_factory=Mock(return_value=object()),
         adapter_factory=Mock(side_effect=AssertionError("network must be opt-in")),
-        version=lambda name: "1.2.3",
+        version=lambda name: DEPENDENCIES[name][1],
         import_module=lambda name: object(),
     )
     return DoctorService(**(args | overrides))
@@ -144,3 +144,38 @@ def test_cli_completed_report_can_contain_failed_checks(capsys):
     assert any(check["status"] == "fail" for check in report["data"]["checks"])
     assert "private-sentinel" not in output.out + output.err
     assert output.err == ""
+
+
+@pytest.mark.parametrize("distribution", list(DEPENDENCIES))
+@pytest.mark.parametrize("installed", ["0.0.1", "999.0.0", "0.18.0rc1"])
+def test_importable_wrong_versions_fail_with_recovery(distribution, installed):
+    importer = Mock()
+    result = run(
+        service(
+            version=lambda name: installed if name == distribution else DEPENDENCIES[name][1],
+            import_module=importer,
+        ).execute(Request(Command.DOCTOR))
+    )
+    report = checks(result)
+    check = report["dependency_" + distribution]
+    assert check.status == "fail"
+    assert installed in check.message
+    assert DEPENDENCIES[distribution][1] in check.message
+    assert "Reinstall" in check.message
+    assert all(
+        report["dependency_" + name].status == "pass"
+        for name in DEPENDENCIES
+        if name != distribution
+    )
+    assert all(call.args != (DEPENDENCIES[distribution][0],) for call in importer.call_args_list)
+
+
+def test_diagnostic_pins_match_project_runtime_requirements():
+    import tomllib
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+    assert {f"{name}=={required}" for name, (_, required) in DEPENDENCIES.items()} == set(
+        project["project"]["dependencies"]
+    )

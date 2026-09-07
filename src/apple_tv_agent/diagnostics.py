@@ -13,11 +13,11 @@ from apple_tv_agent.pairing import private_protocol_logs
 from apple_tv_agent.ports import CommandResult
 
 DEPENDENCIES = {
-    "pyatv": "pyatv",
-    "keyring": "keyring",
-    "platformdirs": "platformdirs",
-    "pydantic": "pydantic",
-    "filelock": "filelock",
+    "pyatv": ("pyatv", "0.18.0"),
+    "keyring": ("keyring", "25.7.0"),
+    "platformdirs": ("platformdirs", "4.11.7"),
+    "pydantic": ("pydantic", "2.13.5"),
+    "filelock": ("filelock", "3.32.5"),
 }
 
 
@@ -79,13 +79,21 @@ class DoctorService:
                 if sys.prefix != sys.base_prefix
                 else "Running outside a virtual environment; use an isolated environment for dependency recovery.",
             )
-            for distribution, module in DEPENDENCIES.items():
+            for distribution, (module, required) in DEPENDENCIES.items():
                 try:
                     version = self.version(distribution)
                     if not isinstance(version, str) or not re.fullmatch(
                         r"[0-9A-Za-z.+_-]{1,80}", version
                     ):
                         raise ValueError()
+                    if version != required:
+                        add(
+                            "dependency_" + distribution,
+                            "fail",
+                            f"Installed version: {version}; required version: {required}. "
+                            "Reinstall with the locked setup instructions in docs/cli-contract.md.",
+                        )
+                        continue
                     self.import_module(module)
                 except Exception:
                     add(

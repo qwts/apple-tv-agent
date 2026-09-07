@@ -43,3 +43,7 @@ When complete, record changed files, exact validation commands and results, host
 - Live macOS 26.6.2 arm64 / Python 3.14.7: local doctor and explicit network doctor completed with empty stderr. Local backend/registry checks passed; vault access remained not_tested. Network doctor observed Apple TV discovery responses without pairing or controls.
 
 Windows hardware/vault recovery remains unverified in issues 001/010. The independent optional LG capture spike and follow-up issue 011 record observed HDMI screenshots without extending baseline support or committing private captures.
+
+### Review follow-up
+
+Doctor now reports a failed dependency check for importable versions that differ from the exact runtime pins, with installed/required versions and locked-install recovery guidance. Regression coverage checks older/newer/prerelease mismatches for every runtime dependency and verifies that diagnostic pins match pyproject.toml.
