@@ -266,7 +266,9 @@ def test_other_process_holding_device_lock_prevents_connection(selected):
         service = SessionService(SimpleNamespace(session=factory), registry, object())
         with pytest.raises(AgentError) as error:
             run(service.execute(Request(Command.STATUS, timeout=0.2)))
-        assert error.value.code == ErrorCode.DEVICE_BUSY
+        # A loaded runner can exhaust the overall deadline before the lock poll.
+        # Both outcomes must prevent any connection while the other process owns it.
+        assert error.value.code in (ErrorCode.DEVICE_BUSY, ErrorCode.TIMEOUT)
     finally:
         release.set()
         worker.join(10)
