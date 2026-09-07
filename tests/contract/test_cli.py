@@ -189,6 +189,7 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
         if c
         not in {
             *CORE_CONTROLS,
+            Command.DOCTOR,
             Command.STATUS,
             Command.CAPABILITIES,
             Command.PAIR,
@@ -329,11 +330,11 @@ def test_entry_points_match_from_another_directory(tmp_path):
     )
     commands = [[str(console)], [sys.executable, "-m", "apple_tv_agent"]]
     results = [
-        subprocess.run(command + ["doctor"], cwd=tmp_path, capture_output=True)
+        subprocess.run(command + ["remote", "unknown-action"], cwd=tmp_path, capture_output=True)
         for command in commands
     ]
     assert results[0].stdout == results[1].stdout
-    assert [r.returncode for r in results] == [4, 4]
+    assert [r.returncode for r in results] == [2, 2]
     assert all(r.stderr == b"" for r in results)
     VALIDATOR.validate(json.loads(results[0].stdout))
 

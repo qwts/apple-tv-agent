@@ -1,7 +1,7 @@
 # 008: Add actionable local diagnostics and recovery guidance
 
 GitHub: https://github.com/qwts/apple-tv-agent/issues/8
-Status: open
+Status: in review
 Priority: P1
 Depends on: [005](005-session-status.md)
 
@@ -21,9 +21,9 @@ Read [DESIGN.md](../DESIGN.md) before implementation. Its contracts and release 
 
 ## Acceptance criteria
 
-- [ ] doctor defaults to local checks and does not mutate TV, firewall or network settings.
-- [ ] Common failures include actionable next steps and report observations without unjustified certainty.
-- [ ] Diagnostic artifacts contain no secret or typed-text sentinel.
+- [x] doctor defaults to local checks and does not mutate TV, firewall or network settings.
+- [x] Common failures include actionable next steps and report observations without unjustified certainty.
+- [x] Diagnostic artifacts contain no secret or typed-text sentinel.
 
 ## Validation
 
@@ -32,3 +32,14 @@ Test missing dependencies, locked vault, corrupt config, no network, empty scan 
 ## Completion evidence
 
 When complete, record changed files, exact validation commands and results, host/device versions where relevant, and remaining limitations here. Update status only after acceptance criteria are satisfied. Never record secrets or raw sensitive logs.
+
+### Implementation evidence (2026-09-07)
+
+- Added DoctorService with dependency versions/import checks, interpreter/host/environment context, exact native-backend selection, registry readability and conservative pairing-marker observations. Default doctor never constructs a network adapter and never reads/writes credentials.
+- `--network` performs only bounded discovery and reports candidate counts, empty results, timeout or transport failure without claiming firewall diagnosis. A completed diagnostic report exits 0; individual health checks retain pass/fail/not_tested. CLI deadline/parser failures keep the existing error contract.
+- Added bundled [troubleshooting guidance](../docs/troubleshooting.md), verified against current Apple/Microsoft primary documentation. Missing foundational imports that prevent CLI startup require environment recovery outside doctor.
+- `.venv/bin/python -m pytest -q`: **366 passed, 1 native-vault opt-in test skipped**. Tests cover local-only behavior, missing/broken dependencies, vault selection failure without access claims, corrupt-registry preservation, network timeout/empty/error and sentinel redaction.
+- Ruff, locked dependency sync/check, source/wheel builds and fresh installed-wheel checks under `python -O` passed. Wheel entry-point checks now exercise implemented local doctor; deterministic error tests use an invalid remote action.
+- Live macOS 26.6.2 arm64 / Python 3.14.7: local doctor and explicit network doctor completed with empty stderr. Local backend/registry checks passed; vault access remained not_tested. Network doctor observed Apple TV discovery responses without pairing or controls.
+
+Windows hardware/vault recovery remains unverified in issues 001/010. The independent optional LG capture spike and follow-up issue 011 record observed HDMI screenshots without extending baseline support or committing private captures.

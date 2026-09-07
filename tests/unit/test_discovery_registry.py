@@ -13,9 +13,8 @@ from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter, normalize
 from apple_tv_agent.cli import main
 from apple_tv_agent.discovery import resolve_identity, select_device, select_pairing_candidate
 from apple_tv_agent.errors import AgentError, ErrorCode
-from apple_tv_agent.models import Command, DiscoveredDevice
+from apple_tv_agent.models import DiscoveredDevice
 from apple_tv_agent.registry import DeviceRegistry
-from apple_tv_agent.request import Request
 from apple_tv_agent.service import ContractService
 
 
@@ -318,9 +317,6 @@ def test_discovery_and_registry_service_are_isolated(registry, capsys):
         assert result["ok"] is True
     assert result["data"]["default_device_id"] == device.device_id
     assert adapter.discover.await_count == 1
-    with pytest.raises(AgentError) as error:
-        run(service.execute(Request(Command.DOCTOR)))
-    assert error.value.code == ErrorCode.FEATURE_UNAVAILABLE
 
 
 def alias_with_result(path, device_id, queue):
