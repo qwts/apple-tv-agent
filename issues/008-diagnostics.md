@@ -1,5 +1,6 @@
 # 008: Add actionable local diagnostics and recovery guidance
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/8
 Status: open
 Priority: P1
 Depends on: [005](005-session-status.md)

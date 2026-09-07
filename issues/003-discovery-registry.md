@@ -1,5 +1,6 @@
 # 003: Implement discovery, durable identity and device selection
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/3
 Status: open
 Priority: P0
 Depends on: [002](002-package-contract.md)

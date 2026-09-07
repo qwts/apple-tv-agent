@@ -1,5 +1,6 @@
 # 007: Implement installed-app launch and focused text input
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/7
 Status: open
 Priority: P1
 Depends on: [006](006-core-controls.md)

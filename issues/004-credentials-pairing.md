@@ -1,5 +1,6 @@
 # 004: Implement native credentials and interactive pairing
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/4
 Status: open
 Priority: P0
 Depends on: [003](003-discovery-registry.md)

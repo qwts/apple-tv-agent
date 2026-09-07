@@ -1,5 +1,6 @@
 # 001: Validate pyatv and cross-platform feasibility
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/1
 Status: in progress
 Priority: P0
 Depends on: None
