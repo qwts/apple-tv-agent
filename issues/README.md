@@ -14,8 +14,9 @@ The implementation plans are maintained here and tracked as [GitHub issues](http
 | [008: Add actionable local diagnostics and recovery guidance](008-diagnostics.md) | P1 | 005 | Complete |
 | [009: Author and package the portable Apple TV control skill](009-agent-skill.md) | P0 | 006, 007, 008 | In review |
 | [010: Complete cross-platform CI and real-device release validation](010-validation-release.md) | P0 | 009 | Open |
+| [016: Versioned GitHub release bundles](016-release-pipeline.md) | P1 | 010; coordinate optional LG validation with 011–015 | Open |
 
-Suggested sequence: 001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010. Issue 008 can start after 005 independently of control implementation.
+Suggested sequence: 001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 016. Issue 008 can start after 005 independently of control implementation.
 
 For each issue, follow its implementation plan, validate acceptance criteria, and record evidence before changing its status and this index. If a dependency decision changes, update DESIGN.md and downstream issues together. Keep missing hardware/OS evidence explicit; finish independent work but do not mark an unmet release gate complete.
 
@@ -35,6 +36,7 @@ Agent handoff example:
 - Issue 008: https://github.com/qwts/apple-tv-agent/issues/8
 - Issue 009: https://github.com/qwts/apple-tv-agent/issues/9
 - Issue 010: https://github.com/qwts/apple-tv-agent/issues/10
+- Issue 016: https://github.com/qwts/apple-tv-agent/issues/30
 
 ## Optional follow-up
 
