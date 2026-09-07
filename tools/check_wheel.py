@@ -9,6 +9,26 @@ import venv
 from pathlib import Path
 
 
+def check_results(results, expected):
+    if len(results) != 2 or any(result.returncode != expected for result in results):
+        raise RuntimeError("Entry point returned an unexpected exit code.")
+    if results[0].stdout != results[1].stdout:
+        raise RuntimeError("Entry point output differs.")
+    if any(result.stderr for result in results):
+        raise RuntimeError("Entry point wrote unexpected stderr.")
+    if expected:
+        data = json.loads(results[0].stdout)
+        if data.get("ok") is not False:
+            raise RuntimeError("Expected a failure envelope.")
+        if set(data) != {"schema_version", "ok", "command", "device_id", "data", "error"}:
+            raise RuntimeError("Envelope fields differ from the contract.")
+
+
+def check_schema(schema):
+    if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+        raise RuntimeError("Bundled schema has an unexpected dialect.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--requirements", type=Path, required=True)
@@ -52,32 +72,20 @@ def main():
                 subprocess.run(command + argv, capture_output=True, cwd=base, env=env)
                 for command in entrypoints
             ]
-            assert all(result.returncode == expected for result in results), results
-            assert results[0].stdout == results[1].stdout
-            assert all(not result.stderr for result in results)
-            if expected:
-                data = json.loads(results[0].stdout)
-                assert data["ok"] is False
-                assert set(data) == {
-                    "schema_version",
-                    "ok",
-                    "command",
-                    "device_id",
-                    "data",
-                    "error",
-                }
-        subprocess.run(
+            check_results(results, expected)
+        schema_result = subprocess.run(
             [
                 str(python),
                 "-c",
-                "from importlib.resources import files; import json; "
-                "schema = json.loads(files('apple_tv_agent').joinpath('response-v1.json').read_text()); "
-                "assert schema['$schema'].endswith('/2020-12/schema')",
+                "from importlib.resources import files; "
+                "print(files('apple_tv_agent').joinpath('response-v1.json').read_text(encoding='utf-8'))",
             ],
             check=True,
+            capture_output=True,
             cwd=base,
             env=env,
         )
+        check_schema(json.loads(schema_result.stdout))
     print(
         "Clean wheel installation and both entry points passed (working directory contains spaces)."
     )

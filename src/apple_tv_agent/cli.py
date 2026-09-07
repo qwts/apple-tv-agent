@@ -9,9 +9,11 @@ from collections.abc import Callable, Sequence
 from ipaddress import IPv4Address
 from typing import BinaryIO
 
+from pydantic import TypeAdapter, ValidationError
+
 from apple_tv_agent import __version__
 from apple_tv_agent.errors import AgentError, ErrorCode
-from apple_tv_agent.models import Command, failure, success
+from apple_tv_agent.models import Command, Identifier, failure, success
 from apple_tv_agent.ports import Service
 from apple_tv_agent.request import Request
 from apple_tv_agent.service import ContractService
@@ -27,10 +29,14 @@ class Parser(argparse.ArgumentParser):
         raise AgentError(ErrorCode.INVALID_ARGUMENT)
 
 
+IDENTIFIER_ADAPTER = TypeAdapter(Identifier)
+
+
 def identifier(value: str) -> str:
-    if not value.strip() or len(value) > 256 or any(ord(c) < 32 or ord(c) == 127 for c in value):
-        raise argparse.ArgumentTypeError("Invalid identifier.")
-    return value
+    try:
+        return IDENTIFIER_ADAPTER.validate_python(value)
+    except ValidationError:
+        raise argparse.ArgumentTypeError("Invalid identifier.") from None
 
 
 def number(value: str, lower: float, upper: float) -> float:
@@ -168,7 +174,8 @@ def main(
             # Only parser help/version may exit without a JSON envelope.
             return int(error.code or 0)
         command = request.command
-        if command == Command.PAIR and not sys.stdin.isatty():
+        pairing_input = stdin if stdin is not None else sys.stdin
+        if command == Command.PAIR and not pairing_input.isatty():
             raise AgentError(ErrorCode.INTERACTIVE_REQUIRED)
         service = service_factory()
         result = asyncio.run(execute(service, request))

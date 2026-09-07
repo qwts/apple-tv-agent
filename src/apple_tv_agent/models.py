@@ -4,6 +4,7 @@ from enum import StrEnum
 from typing import Annotated, Literal, Union
 
 from pydantic import (
+    AfterValidator,
     AwareDatetime,
     BaseModel,
     ConfigDict,
@@ -17,7 +18,23 @@ from pydantic import (
 
 from apple_tv_agent.errors import ERRORS, AgentError, ErrorCode
 
-Identifier = Annotated[str, Field(min_length=1, max_length=256)]
+
+def identifier_characters(value: str) -> str:
+    if not value.strip() or any(ord(c) < 32 or ord(c) == 127 for c in value):
+        raise ValueError("Invalid identifier characters.")
+    return value
+
+
+Identifier = Annotated[
+    str,
+    Field(
+        min_length=1,
+        max_length=256,
+        pattern=r"\S",
+        json_schema_extra={"not": {"pattern": r"[\u0000-\u001f\u007f]"}},
+    ),
+    AfterValidator(identifier_characters),
+]
 Level = Annotated[FiniteFloat, Field(ge=0, le=100)]
 Position = Annotated[FiniteFloat, Field(ge=0)]
 
@@ -222,7 +239,7 @@ SUCCESS_MODELS = {
         command.value.replace(".", "_").title().replace("_", "") + "Success",
         __base__=Envelope,
         device_id=(
-            Identifier | None
+            Literal[None]
             if command in (Command.DOCTOR, Command.DISCOVER, Command.DEVICES_LIST)
             else Identifier,
             ...,

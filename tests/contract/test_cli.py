@@ -10,6 +10,7 @@ from unittest.mock import Mock
 
 import pytest
 from jsonschema import Draft202012Validator
+from pydantic import TypeAdapter, ValidationError
 
 from apple_tv_agent.cli import main, parse_request
 from apple_tv_agent.errors import ERRORS, AgentError, ErrorCode
@@ -25,6 +26,7 @@ from apple_tv_agent.models import (
     DiscoveryData,
     DoctorData,
     ForgetData,
+    Identifier,
     PairData,
     StatusData,
     failure,
@@ -188,7 +190,8 @@ def test_pending_services_are_explicitly_unavailable(command, monkeypatch, capsy
         Command.APPS_LAUNCH: ["--app-id", "com.example.app"],
         Command.KEYBOARD_TYPE: ["--text-stdin"],
     }
-    assert main(argv + extra.get(command, []), stdin=io.BytesIO(b"example")) == 4
+    stream = io.BytesIO(b"example") if command == Command.KEYBOARD_TYPE else None
+    assert main(argv + extra.get(command, []), stdin=stream) == 4
     result = json.loads(capsys.readouterr().out)
     VALIDATOR.validate(result)
     assert result["command"] == command
@@ -325,3 +328,83 @@ def test_schema_rejects_unobserved_confirmation_and_missing_action_identity():
     result["data"]["outcome"] = "sent"
     result["device_id"] = None
     assert not VALIDATOR.is_valid(result)
+
+
+@pytest.mark.parametrize(
+    "command,data",
+    [
+        (Command.DOCTOR, DoctorData(version="test", python="3.12", platform="test", checks=[])),
+        (Command.DISCOVER, DiscoveryData(devices=[])),
+        (Command.DEVICES_LIST, DevicesData(devices=[], default_device_id=None)),
+    ],
+)
+def test_global_success_rejects_device_identity(command, data, capsys):
+    with pytest.raises(ValidationError):
+        success(command, "stale-device", data)
+    envelope = success(command, None, data).model_dump(mode="json")
+    envelope["device_id"] = "stale-device"
+    assert not VALIDATOR.is_valid(envelope)
+
+    class BadService:
+        async def execute(self, request):
+            return CommandResult("stale-device", data)
+
+    assert main(command.value.split("."), service_factory=BadService) == 1
+    result = json.loads(capsys.readouterr().out)
+    VALIDATOR.validate(result)
+    assert result["error"]["code"] == "INTERNAL_ERROR"
+
+
+@pytest.mark.parametrize(
+    "value", ["", " ", "\u2003", "\t", "id\n", "id\x00x", "id\x7f", "a\tb", "x" * 257]
+)
+def test_identifier_constraints_match_schema_and_cli(value, capsys):
+    adapter = TypeAdapter(Identifier)
+    with pytest.raises(ValidationError):
+        adapter.validate_python(value)
+    assert not Draft202012Validator(adapter.json_schema()).is_valid(value)
+    factory = Mock()
+    assert main(["status", "--device", value], service_factory=factory) == 2
+    factory.assert_not_called()
+    assert json.loads(capsys.readouterr().out)["error"]["code"] == "INVALID_ARGUMENT"
+
+
+@pytest.mark.parametrize("value", ["Living room", "Télévision", " 客厅 "])
+def test_identifier_preserves_valid_values(value):
+    adapter = TypeAdapter(Identifier)
+    assert adapter.validate_python(value) == value
+    Draft202012Validator(adapter.json_schema()).validate(value)
+
+
+@pytest.mark.parametrize("actual_tty", [False, True])
+@pytest.mark.parametrize("supplied_tty", [False, True])
+def test_pairing_uses_supplied_stream(actual_tty, supplied_tty, monkeypatch, capsys):
+    monkeypatch.setattr(sys.stdin, "isatty", lambda: actual_tty)
+    stream = Mock()
+    stream.isatty.return_value = supplied_tty
+    assert main(["pair"], stdin=stream) == (4 if supplied_tty else 3)
+    result = json.loads(capsys.readouterr().out)
+    assert result["error"]["code"] == (
+        "FEATURE_UNAVAILABLE" if supplied_tty else "INTERACTIVE_REQUIRED"
+    )
+
+
+@pytest.mark.parametrize("case", ["exit", "output", "stderr", "ok", "fields", "schema", "valid"])
+def test_wheel_checks_survive_optimized_python(case):
+    script = f"""
+import json, runpy
+from types import SimpleNamespace
+checks = runpy.run_path({str(ROOT / "tools/check_wheel.py")!r})
+envelope = dict(schema_version=1, ok=False, command=None, device_id=None, data=None, error={{}})
+case = {case!r}
+if case == 'ok': envelope['ok'] = True
+if case == 'fields': del envelope['data']
+results = [SimpleNamespace(returncode=2, stdout=json.dumps(envelope).encode(), stderr=b'') for _ in range(2)]
+if case == 'exit': results[0].returncode = 0
+if case == 'output': results[0].stdout = b'different'
+if case == 'stderr': results[0].stderr = b'unexpected'
+checks['check_results'](results, 2)
+checks['check_schema']({{'$schema': 'bad' if case == 'schema' else 'https://json-schema.org/draft/2020-12/schema'}})
+"""
+    result = subprocess.run([sys.executable, "-O", "-c", script], capture_output=True)
+    assert (result.returncode == 0) == (case == "valid"), result.stderr

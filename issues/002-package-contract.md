@@ -42,3 +42,7 @@ When complete, record changed files, exact validation commands and results, host
 - Issue 001 remains open for Windows 11 hardware and native-vault persistence. This issue implements the development contract without waiving those release gates.
 
 Local validation: **143 tests passed** (contract and existing transport suites); Ruff checks/formatting, lock consistency, dependency checks, source/wheel build, and fresh wheel entry-point smoke tests passed on macOS arm64 / Python 3.14.7. All four cross-platform CI jobs passed in [run 34088665314](https://github.com/qwts/apple-tv-agent/actions/runs/34088665314): macOS and Windows, each on Python 3.12 and 3.14, including all 143 tests and clean wheel installation. Implementation PR: [#12](https://github.com/qwts/apple-tv-agent/pull/12).
+
+### Review follow-up
+
+Global successes now require a null device ID; CLI and response identifiers share character constraints reflected in JSON Schema; pairing respects supplied stdin; wheel checks use explicit exceptions so optimization cannot disable them. Regression coverage passes with **169 tests**, Ruff and a fresh wheel installation checked using `python -O`.
