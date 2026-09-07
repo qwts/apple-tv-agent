@@ -1,4 +1,6 @@
-# Transport feasibility evidence
+# Compatibility evidence
+
+Current release status and outstanding gates: [release validation ledger](release-validation.md). Historical results below describe the revisions tested, not a completed release matrix.
 
 Issue: [001](../issues/001-transport-spike.md). Status: **in progress**; hardware and Windows gates remain open. Observed 2026-09-07 UTC (2026-09-06 local).
 
