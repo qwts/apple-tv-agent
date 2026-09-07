@@ -7,6 +7,7 @@ from ipaddress import IPv4Address
 
 from pydantic import ValidationError
 
+from apple_tv_agent.discovery import CANDIDATE_PREFIX
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import DiscoveredDevice, ProtocolName
 
@@ -27,7 +28,7 @@ def normalize(config):
         raise AgentError(ErrorCode.IDENTITY_MISMATCH, details={"reason": "missing_identity"})
     digest = hashlib.sha256(json.dumps(identifiers, sort_keys=True).encode()).hexdigest()
     return DiscoveredDevice(
-        candidate_id="candidate-" + digest,
+        candidate_id=CANDIDATE_PREFIX + digest,
         name=config.name,
         host=str(IPv4Address(config.address)),
         identifiers=identifiers,

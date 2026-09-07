@@ -73,19 +73,24 @@ def main():
                 for command in entrypoints
             ]
             check_results(results, expected)
-        schema_result = subprocess.run(
+        resource_result = subprocess.run(
             [
                 str(python),
                 "-c",
-                "from importlib.resources import files; "
-                "print(files('apple_tv_agent').joinpath('response-v1.json').read_text(encoding='utf-8'))",
+                "import json; from importlib.resources import files; "
+                "root = files('apple_tv_agent'); "
+                "print(json.dumps({name: root.joinpath(name).read_text(encoding='utf-8') "
+                "for name in ['response-v1.json', 'docs/registry.md']}))",
             ],
             check=True,
             capture_output=True,
             cwd=base,
             env=env,
         )
-        check_schema(json.loads(schema_result.stdout))
+        resources = json.loads(resource_result.stdout)
+        check_schema(json.loads(resources["response-v1.json"]))
+        if resources["docs/registry.md"] != (root / "docs/registry.md").read_text(encoding="utf-8"):
+            raise RuntimeError("Bundled registry recovery guide differs from the source.")
     print(
         "Clean wheel installation and both entry points passed (working directory contains spaces)."
     )

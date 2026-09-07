@@ -44,3 +44,7 @@ When complete, record changed files, exact validation commands and results, host
 - Windows hardware discovery and credential persistence remain issue 001 release gates. Cross-platform CI exercises registry and adapter behavior without a TV.
 
 Usage, platform registry paths, identity semantics and recovery are documented in [docs/registry.md](../docs/registry.md).
+
+### Review follow-up
+
+Bundle the registry guide in wheels and verify its exact installed contents during fresh-wheel checks. Reserve `candidate-` for discovery IDs in alias mutations and registry validation, with recovery guidance for pre-release aliases. Pydantic validation errors already inherited `ValueError` and mapped to `invalid_registry`; split exception branches for clarity and add reason-specific regression assertions. **200 tests pass** locally; Ruff, locked sync, source/wheel build and optimized fresh-wheel checks pass.

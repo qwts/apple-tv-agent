@@ -13,7 +13,12 @@ from filelock import FileLock, Timeout
 from platformdirs import user_config_path
 from pydantic import Field, ValidationError, model_validator
 
-from apple_tv_agent.discovery import identity_matches, identity_overlaps, select_device
+from apple_tv_agent.discovery import (
+    CANDIDATE_PREFIX,
+    identity_matches,
+    identity_overlaps,
+    select_device,
+)
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import DeviceRecord, DiscoveredDevice, Identifier, Model
 
@@ -32,6 +37,8 @@ class RegistryData(Model):
         for index, device in enumerate(self.devices):
             if str(UUID(device.device_id)) != device.device_id or not device.identifiers:
                 raise ValueError("Invalid registered identity")
+            if any(alias.startswith(CANDIDATE_PREFIX) for alias in device.aliases):
+                raise ValueError("Reserved candidate alias")
             aliases.extend(device.aliases)
             if any(
                 identity_overlaps(device.identifiers, other.identifiers)
@@ -50,7 +57,11 @@ def config_error(reason):
         ErrorCode.CONFIG_ERROR,
         details={
             "reason": reason,
-            "recovery": "See docs/registry.md; preserve the registry before recovery.",
+            "recovery": (
+                "Preserve the registry before recovery. See the bundled "
+                "apple_tv_agent/docs/registry.md, also available at "
+                "https://github.com/qwts/apple-tv-agent/blob/main/docs/registry.md"
+            ),
         },
     )
 
@@ -94,10 +105,10 @@ class DeviceRegistry:
                         min(0.05, max(0, deadline - asyncio.get_running_loop().time()))
                     )
             yield self._read()
-        except (OSError, ValueError, ValidationError) as error:
-            raise config_error(
-                "invalid_registry" if isinstance(error, ValueError) else "registry_io"
-            ) from None
+        except (ValueError, ValidationError):
+            raise config_error("invalid_registry") from None
+        except OSError:
+            raise config_error("registry_io") from None
         finally:
             if acquired:
                 lock.release()
@@ -178,6 +189,8 @@ class DeviceRegistry:
             return device.model_copy(deep=True)
 
     async def alias(self, explicit: str | None, name: str):
+        if name.startswith(CANDIDATE_PREFIX):
+            raise AgentError(ErrorCode.INVALID_ARGUMENT, details={"reason": "reserved_alias"})
         async with self.transaction() as data:
             device = select_device(data.devices, data.default_device_id, explicit)
             if any(

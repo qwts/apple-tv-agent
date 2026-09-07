@@ -182,6 +182,7 @@ def test_invalid_registry_records_are_rejected(registry, damage):
     with pytest.raises(AgentError) as error:
         run(registry.snapshot())
     assert error.value.code == ErrorCode.CONFIG_ERROR
+    assert error.value.details["reason"] == "invalid_registry"
     assert "secret-sentinel" not in str(error.value.details)
     assert registry.path.read_text() == raw
 
@@ -197,6 +198,7 @@ def test_failed_replace_retains_old_registry_and_cleans_temporary(registry, monk
     with pytest.raises(AgentError) as error:
         run(registry.alias(device.device_id, "new"))
     assert error.value.code == ErrorCode.CONFIG_ERROR
+    assert error.value.details["reason"] == "registry_io"
     assert registry.path.read_bytes() == original
     assert list(registry.path.parent.glob(".registry-*.tmp")) == []
 
@@ -389,3 +391,29 @@ def test_discovery_excludes_non_tvos_devices(monkeypatch):
     result = run(PyatvAdapter().discover(host=None, timeout=2))
     assert len(result) == 1
     assert result[0].identifiers == {"airplay": "one"}
+
+
+@pytest.mark.parametrize("alias", ["candidate-", "candidate-one", "candidate-" + "a" * 64])
+def test_candidate_namespace_cannot_be_shadowed_by_alias(registry, alias):
+    device = run(registry.register(candidate()))
+    original = registry.path.read_bytes()
+    with pytest.raises(AgentError) as error:
+        run(registry.alias(device.device_id, alias))
+    assert error.value.code == ErrorCode.INVALID_ARGUMENT
+    assert error.value.details["reason"] == "reserved_alias"
+    assert registry.path.read_bytes() == original
+    fresh = candidate("new")
+    fresh.candidate_id = alias
+    assert select_pairing_candidate([device], None, [fresh], alias) == fresh
+
+
+def test_reserved_alias_in_existing_registry_is_preserved_and_rejected(registry):
+    run(registry.register(candidate()))
+    data = json.loads(registry.path.read_text())
+    data["devices"][0]["aliases"] = ["candidate-one"]
+    raw = json.dumps(data)
+    registry.path.write_text(raw)
+    with pytest.raises(AgentError) as error:
+        run(registry.snapshot())
+    assert error.value.details["reason"] == "invalid_registry"
+    assert registry.path.read_text() == raw

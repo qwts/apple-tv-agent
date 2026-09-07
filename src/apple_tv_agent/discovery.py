@@ -3,6 +3,8 @@
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import DeviceRecord, DiscoveredDevice
 
+CANDIDATE_PREFIX = "candidate-"
+
 
 def identity_matches(known: dict, observed: dict) -> bool:
     shared = known.keys() & observed.keys()
