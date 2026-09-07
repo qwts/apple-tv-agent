@@ -177,7 +177,12 @@ def main(
         pairing_input = stdin if stdin is not None else sys.stdin
         if command == Command.PAIR and not pairing_input.isatty():
             raise AgentError(ErrorCode.INTERACTIVE_REQUIRED)
-        service = service_factory()
+        if command == Command.PAIR and service_factory is ContractService:
+            from apple_tv_agent.pin import read_pin
+
+            service = ContractService(pin_reader=lambda: read_pin(stream=pairing_input))
+        else:
+            service = service_factory()
         result = asyncio.run(execute(service, request))
         response = success(command, result.device_id, result.data)
         exit_code = 0

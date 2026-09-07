@@ -7,11 +7,28 @@ from apple_tv_agent.request import Request
 
 
 class ContractService:
-    def __init__(self, *, adapter=None, registry=None):
+    def __init__(self, *, adapter=None, registry=None, vault=None, pin_reader=None):
         self.adapter = adapter
         self.registry = registry
+        self.vault = vault
+        self.pin_reader = pin_reader
 
     async def execute(self, request: Request) -> CommandResult:
+        if request.command in (Command.PAIR, Command.DEVICES_FORGET):
+            from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
+            from apple_tv_agent.credentials import NativeCredentialStore
+            from apple_tv_agent.pairing import PairingService
+            from apple_tv_agent.registry import DeviceRegistry
+
+            service = PairingService(
+                self.adapter or PyatvAdapter(),
+                self.registry or DeviceRegistry(),
+                self.vault or NativeCredentialStore(),
+                pin_reader=self.pin_reader,
+            )
+            if request.command == Command.PAIR:
+                return await service.pair(request)
+            return await service.forget(request)
         if request.command == Command.DISCOVER:
             adapter = self.adapter
             if adapter is None:

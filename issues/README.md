@@ -6,8 +6,8 @@ The implementation plans are maintained here and tracked as [GitHub issues](http
 | --- | --- | --- | --- |
 | [001: Validate pyatv and cross-platform feasibility](001-transport-spike.md) | P0 | — | In progress |
 | [002: Create the Python package and JSON CLI contract](002-package-contract.md) | P0 | 001 | Complete |
-| [003: Implement discovery, durable identity and device selection](003-discovery-registry.md) | P0 | 002 | In review |
-| [004: Implement native credentials and interactive pairing](004-credentials-pairing.md) | P0 | 003 | Open |
+| [003: Implement discovery, durable identity and device selection](003-discovery-registry.md) | P0 | 002 | Complete |
+| [004: Implement native credentials and interactive pairing](004-credentials-pairing.md) | P0 | 003 | In review |
 | [005: Implement bounded sessions, capabilities and status](005-session-status.md) | P0 | 004 | Open |
 | [006: Implement navigation, playback, power and volume](006-core-controls.md) | P0 | 005 | Open |
 | [007: Implement installed-app launch and focused text input](007-apps-keyboard.md) | P1 | 006 | Open |

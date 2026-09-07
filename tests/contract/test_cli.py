@@ -187,6 +187,8 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
         for c in Command
         if c
         not in {
+            Command.PAIR,
+            Command.DEVICES_FORGET,
             Command.DISCOVER,
             Command.DEVICES_LIST,
             Command.DEVICES_ALIAS,
@@ -395,7 +397,10 @@ def test_pairing_uses_supplied_stream(actual_tty, supplied_tty, monkeypatch, cap
     monkeypatch.setattr(sys.stdin, "isatty", lambda: actual_tty)
     stream = Mock()
     stream.isatty.return_value = supplied_tty
-    assert main(["pair"], stdin=stream) == (4 if supplied_tty else 3)
+    factory = Mock(
+        return_value=FakeService(FakeAdapter(error=AgentError(ErrorCode.FEATURE_UNAVAILABLE)))
+    )
+    assert main(["pair"], stdin=stream, service_factory=factory) == (4 if supplied_tty else 3)
     result = json.loads(capsys.readouterr().out)
     assert result["error"]["code"] == (
         "FEATURE_UNAVAILABLE" if supplied_tty else "INTERACTIVE_REQUIRED"

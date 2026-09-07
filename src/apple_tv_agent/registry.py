@@ -210,3 +210,19 @@ class DeviceRegistry:
             data.default_device_id = device.device_id
             self._write(data)
             return device.device_id
+
+    async def mark_paired(self, device_id, protocol):
+        async with self.transaction() as data:
+            device = select_device(data.devices, None, device_id)
+            if protocol not in device.paired_protocols:
+                device.paired_protocols.append(protocol)
+                self._write(data)
+
+    async def remove(self, device_id):
+        async with self.transaction() as data:
+            cleared = data.default_device_id == device_id
+            data.devices = [device for device in data.devices if device.device_id != device_id]
+            if cleared:
+                data.default_device_id = None
+            self._write(data)
+            return cleared

@@ -80,7 +80,7 @@ def main():
                 "import json; from importlib.resources import files; "
                 "root = files('apple_tv_agent'); "
                 "print(json.dumps({name: root.joinpath(name).read_text(encoding='utf-8') "
-                "for name in ['response-v1.json', 'docs/registry.md']}))",
+                "for name in ['response-v1.json', 'docs/registry.md', 'docs/pairing.md']}))",
             ],
             check=True,
             capture_output=True,
@@ -89,8 +89,9 @@ def main():
         )
         resources = json.loads(resource_result.stdout)
         check_schema(json.loads(resources["response-v1.json"]))
-        if resources["docs/registry.md"] != (root / "docs/registry.md").read_text(encoding="utf-8"):
-            raise RuntimeError("Bundled registry recovery guide differs from the source.")
+        for guide in ("docs/registry.md", "docs/pairing.md"):
+            if resources[guide] != (root / guide).read_text(encoding="utf-8"):
+                raise RuntimeError("Bundled recovery guide differs from the source.")
     print(
         "Clean wheel installation and both entry points passed (working directory contains spaces)."
     )
