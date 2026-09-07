@@ -1,6 +1,6 @@
 """Route implemented discovery, registry, pairing, session and control commands."""
 
-from apple_tv_agent.controls import CORE_CONTROLS
+from apple_tv_agent.controls import MUTATIONS
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import AliasData, Command, DefaultData, DevicesData, DiscoveryData
 from apple_tv_agent.ports import CommandResult
@@ -20,8 +20,8 @@ class ContractService:
 
             return await DoctorService().execute(request)
         if (
-            request.command in (Command.STATUS, Command.CAPABILITIES)
-            or request.command in CORE_CONTROLS
+            request.command in (Command.STATUS, Command.CAPABILITIES, Command.APPS_LIST)
+            or request.command in MUTATIONS
         ):
             from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
             from apple_tv_agent.credentials import NativeCredentialStore
@@ -35,7 +35,7 @@ class ContractService:
                     self.vault or NativeCredentialStore(),
                 )
             except Exception as error:
-                if request.command not in CORE_CONTROLS:
+                if request.command not in MUTATIONS:
                     raise
                 public = (
                     error if isinstance(error, AgentError) else AgentError(ErrorCode.INTERNAL_ERROR)

@@ -13,7 +13,6 @@ from jsonschema import Draft202012Validator
 from pydantic import TypeAdapter, ValidationError
 
 from apple_tv_agent.cli import main, parse_request
-from apple_tv_agent.controls import CORE_CONTROLS
 from apple_tv_agent.errors import ERRORS, AgentError, ErrorCode
 from apple_tv_agent.models import (
     PAYLOADS,
@@ -179,43 +178,6 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
     VALIDATOR.validate(result)
     assert result["error"]["code"] == "INTERACTIVE_REQUIRED"
     factory.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "command",
-    [
-        c
-        for c in Command
-        if c
-        not in {
-            *CORE_CONTROLS,
-            Command.DOCTOR,
-            Command.STATUS,
-            Command.CAPABILITIES,
-            Command.PAIR,
-            Command.DEVICES_FORGET,
-            Command.DISCOVER,
-            Command.DEVICES_LIST,
-            Command.DEVICES_ALIAS,
-            Command.DEVICES_DEFAULT,
-        }
-    ],
-)
-def test_pending_services_are_explicitly_unavailable(command, monkeypatch, capsys):
-    monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
-    argv = command.value.split(".")
-    extra = {
-        Command.DEVICES_ALIAS: ["--name", "living-room"],
-        Command.VOLUME_SET: ["--level", "50"],
-        Command.APPS_LAUNCH: ["--app-id", "com.example.app"],
-        Command.KEYBOARD_TYPE: ["--text-stdin"],
-    }
-    stream = io.BytesIO(b"example") if command == Command.KEYBOARD_TYPE else None
-    assert main(argv + extra.get(command, []), stdin=stream) == 4
-    result = json.loads(capsys.readouterr().out)
-    VALIDATOR.validate(result)
-    assert result["command"] == command
-    assert result["error"]["details"] == {"reason": "not_implemented"}
 
 
 @pytest.mark.parametrize("code", list(ErrorCode))

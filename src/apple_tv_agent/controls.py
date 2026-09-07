@@ -2,6 +2,7 @@
 
 import math
 
+from apple_tv_agent.apps_keyboard import APP_KEYBOARD_MUTATIONS
 from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import ActionData, Command
 
@@ -24,6 +25,8 @@ CORE_CONTROLS = {
     Command.VOLUME_DOWN: ("audio", "volume_down", "VolumeDown"),
     Command.VOLUME_SET: ("audio", "set_volume", "SetVolume"),
 }
+
+MUTATIONS = set(CORE_CONTROLS) | APP_KEYBOARD_MUTATIONS
 
 PLAYBACK_TARGETS = {Command.PLAY: "playing", Command.PAUSE: "paused", Command.STOP: "stopped"}
 POWER_TARGETS = {Command.POWER_ON: "on", Command.POWER_OFF: "off"}

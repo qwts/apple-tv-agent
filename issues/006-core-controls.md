@@ -1,7 +1,7 @@
 # 006: Implement navigation, playback, power and volume
 
 GitHub: https://github.com/qwts/apple-tv-agent/issues/6
-Status: in review
+Status: complete (merged PR #16)
 Priority: P0
 Depends on: [005](005-session-status.md)
 
