@@ -43,3 +43,7 @@ When complete, record changed files, exact validation commands and results, host
 - Reference host macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: saved credentials returned real status and capabilities. The TV reported off/idle; an explicit play request returned FEATURE_UNAVAILABLE, outcome not_sent, retryable false and empty stderr.
 
 Successful production control effects, physical Home/Menu semantics and Windows 11 hardware remain unverified release gates in issues 001/010. See [controls](../docs/controls.md) for mappings, connected display/audio effects and outcome limits. This change does not count an unavailable control as a successful playback hardware test.
+
+### Review follow-up
+
+Control-service construction failures now report not_sent and retryable false before any session starts, preserving native-vault error classification and recovery details. CLI regression tests cover vault initialization failure for all 17 controls. Local full suite: 355 passed, one opt-in native-vault test skipped.

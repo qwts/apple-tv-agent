@@ -24,11 +24,23 @@ class ContractService:
             from apple_tv_agent.registry import DeviceRegistry
             from apple_tv_agent.sessions import SessionService
 
-            return await SessionService(
-                self.adapter or PyatvAdapter(),
-                self.registry or DeviceRegistry(),
-                self.vault or NativeCredentialStore(),
-            ).execute(request)
+            try:
+                service = SessionService(
+                    self.adapter or PyatvAdapter(),
+                    self.registry or DeviceRegistry(),
+                    self.vault or NativeCredentialStore(),
+                )
+            except Exception as error:
+                if request.command not in CORE_CONTROLS:
+                    raise
+                public = (
+                    error if isinstance(error, AgentError) else AgentError(ErrorCode.INTERNAL_ERROR)
+                )
+                raise AgentError(
+                    public.code,
+                    details={**public.details, "device_id": None, "outcome": "not_sent"},
+                ) from None
+            return await service.execute(request)
         if request.command in (Command.PAIR, Command.DEVICES_FORGET):
             from apple_tv_agent.adapters.pyatv_adapter import PyatvAdapter
             from apple_tv_agent.credentials import NativeCredentialStore

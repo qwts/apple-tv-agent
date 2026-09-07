@@ -220,3 +220,33 @@ def test_mutations_never_retry_and_preserve_dispatch_uncertainty(tmp_path, failu
 def test_mismatched_readback_is_sent(command, values):
     session = session_for(command, observed=state(**values))
     assert run(session.act(Request(command, level=42))).outcome == "sent"
+
+
+@pytest.mark.parametrize("command", list(CORE_CONTROLS))
+def test_vault_initialization_failure_is_not_sent(command, monkeypatch, capsys):
+    import json
+
+    from apple_tv_agent.credentials import vault_error
+    from apple_tv_agent.service import ContractService
+
+    failure = vault_error("native_backend_required")
+    constructor = Mock(side_effect=failure)
+    monkeypatch.setattr("apple_tv_agent.credentials.NativeCredentialStore", constructor)
+    adapter = Mock()
+    service = ContractService(adapter=adapter, registry=Mock())
+    argv = command.value.split(".")
+    if command == Command.VOLUME_SET:
+        argv += ["--level", "42"]
+    assert main(argv, service_factory=lambda: service) == 3
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    assert output.err == ""
+    assert result["device_id"] is None
+    assert result["error"] == {
+        "code": "CREDENTIAL_STORE_UNAVAILABLE",
+        "message": str(failure),
+        "retryable": False,
+        "details": {**failure.details, "device_id": None, "outcome": "not_sent"},
+    }
+    constructor.assert_called_once_with()
+    adapter.session.assert_not_called()
