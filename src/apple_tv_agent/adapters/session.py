@@ -39,7 +39,7 @@ ACTION_FEATURES = {
     Command.VOLUME_SET: "SetVolume",
     Command.APPS_LIST: "AppList",
     Command.APPS_LAUNCH: "LaunchApp",
-    Command.KEYBOARD_TYPE: "TextSet",
+    Command.KEYBOARD_TYPE: "TextAppend",
 }
 
 

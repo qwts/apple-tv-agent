@@ -420,3 +420,22 @@ def test_partial_facade_connect_keeps_owned_setup_handles(selected, monkeypatch,
     run(exercise())
     assert events == ["setup-retained", "setup-closed"]
     manager.close.assert_awaited_once()
+
+
+@pytest.mark.parametrize(
+    "append,replace,expected",
+    [
+        ("Available", "Unsupported", "available"),
+        ("Unsupported", "Available", "unsupported"),
+        ("Unavailable", "Available", "unavailable"),
+        ("Unknown", "Available", "unknown"),
+    ],
+)
+def test_keyboard_typing_uses_append_capability(append, replace, expected):
+    from pyatv.const import KeyboardFocusState
+
+    session = OwnedSession(None)
+    session.facade = facade({"TextAppend": append, "TextSet": replace})
+    session.facade.keyboard.text_focus_state = KeyboardFocusState.Focused
+    result = run(session.capabilities())
+    assert result.features[Command.KEYBOARD_TYPE].state == expected

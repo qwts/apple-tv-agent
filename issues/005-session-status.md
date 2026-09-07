@@ -44,3 +44,7 @@ When complete, record changed files, exact validation commands and results, host
 - Locked dependency checks, Ruff, source/wheel builds and fresh wheel checks under `python -O` passed. Wheel smoke tests use unimplemented `doctor` for deterministic unavailable errors, so they do not contact local devices. Recovery/session guides are bundled and checked against source contents.
 
 Windows CI validates simulated sessions and cross-process locking; Windows 11 TV/native-vault hardware status checks remain issue 001 release gates. See [session semantics](../docs/sessions.md).
+
+### Review follow-up
+
+Corrected keyboard typing capability to `TextAppend`, matching the documented append semantics. Regression tests distinguish append-only and replacement-only support, including unavailable/unknown append states with confirmed focus.
