@@ -49,4 +49,3 @@ Agent handoff example:
 [014: Trusted LG pairing](014-lg-pairing.md), tracked as [GitHub #26](https://github.com/qwts/apple-tv-agent/issues/26), implements local certificate/permission approval, native credential persistence, reconnect verification and local removal.
 
 [015: LG capture, binding and skill integration](015-lg-capture.md), tracked as [GitHub #28](https://github.com/qwts/apple-tv-agent/issues/28), completes the optional provider implementation. Status: in review; reference Mac capture/deletion passed, native Windows hardware validation remains open.
-
