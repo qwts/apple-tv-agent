@@ -1,0 +1,194 @@
+{
+  "$defs": {
+    "ImageArtifact": {
+      "additionalProperties": false,
+      "description": "A fully decoded, validated JPEG in a service-owned private local directory.",
+      "properties": {
+        "byte_count": {
+          "exclusiveMinimum": 0,
+          "maximum": 10485760,
+          "title": "Byte Count",
+          "type": "integer"
+        },
+        "delete_after": {
+          "format": "date-time",
+          "title": "Delete After",
+          "type": "string"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 8192,
+          "title": "Height",
+          "type": "integer"
+        },
+        "media_type": {
+          "const": "image/jpeg",
+          "default": "image/jpeg",
+          "title": "Media Type",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 8192,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "width",
+        "height",
+        "byte_count",
+        "sha256",
+        "delete_after"
+      ],
+      "title": "ImageArtifact",
+      "type": "object"
+    },
+    "ScreenBinding": {
+      "additionalProperties": false,
+      "description": "User-selected association; HDMI context does not prove physical source identity.",
+      "properties": {
+        "apple_tv_id": {
+          "format": "uuid",
+          "title": "Apple Tv Id",
+          "type": "string"
+        },
+        "binding_id": {
+          "format": "uuid",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "hdmi_input": {
+          "enum": [
+            "com.webos.app.hdmi1",
+            "com.webos.app.hdmi2",
+            "com.webos.app.hdmi3",
+            "com.webos.app.hdmi4"
+          ],
+          "title": "Hdmi Input",
+          "type": "string"
+        },
+        "lg_device_id": {
+          "format": "uuid",
+          "title": "Lg Device Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding_id",
+        "apple_tv_id",
+        "lg_device_id",
+        "hdmi_input"
+      ],
+      "title": "ScreenBinding",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Successful acquisition, which may still provide insufficient visual context.",
+  "properties": {
+    "artifact": {
+      "$ref": "#/$defs/ImageArtifact"
+    },
+    "binding": {
+      "$ref": "#/$defs/ScreenBinding"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "observation_id": {
+      "format": "uuid",
+      "title": "Observation Id",
+      "type": "string"
+    },
+    "observed_input_after": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Observed Input After"
+    },
+    "observed_input_before": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Observed Input Before"
+    },
+    "provider": {
+      "const": "lg-webos",
+      "default": "lg-webos",
+      "title": "Provider",
+      "type": "string"
+    },
+    "quality": {
+      "enum": [
+        "usable",
+        "black",
+        "transitional",
+        "unknown"
+      ],
+      "title": "Quality",
+      "type": "string"
+    },
+    "received_at": {
+      "format": "date-time",
+      "title": "Received At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source_frame_time": {
+      "default": null,
+      "title": "Source Frame Time",
+      "type": "null"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "observation_id",
+    "binding",
+    "started_at",
+    "received_at",
+    "expires_at",
+    "observed_input_before",
+    "observed_input_after",
+    "quality",
+    "artifact"
+  ],
+  "title": "ScreenObservation",
+  "type": "object"
+}

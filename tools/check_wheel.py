@@ -82,7 +82,7 @@ def main():
                 "import json; from importlib.resources import files; "
                 "root = files('apple_tv_agent'); "
                 "print(json.dumps({name: root.joinpath(name).read_text(encoding='utf-8') "
-                "for name in ['response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md', 'docs/controls.md', 'docs/troubleshooting.md', 'docs/apps-keyboard.md']}))",
+                "for name in ['observation-v1.json', 'response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md', 'docs/controls.md', 'docs/troubleshooting.md', 'docs/apps-keyboard.md']}))",
             ],
             check=True,
             capture_output=True,
@@ -90,7 +90,11 @@ def main():
             env=env,
         )
         resources = json.loads(resource_result.stdout)
-        check_schema(json.loads(resources["response-v1.json"]))
+        for name in ("response-v1.json", "observation-v1.json"):
+            bundled = json.loads(resources[name])
+            check_schema(bundled)
+            if bundled != json.loads((root / "schemas" / name).read_text(encoding="utf-8")):
+                raise RuntimeError(f"Bundled {name} differs from source.")
         for guide in (
             "docs/registry.md",
             "docs/pairing.md",
