@@ -13,6 +13,7 @@ from apple_tv_agent.pairing import private_protocol_logs
 from apple_tv_agent.ports import CommandResult
 
 DEPENDENCIES = {
+    "aiohttp": ("aiohttp", "3.14.3"),
     "pyatv": ("pyatv", "0.18.0"),
     "keyring": ("keyring", "25.7.0"),
     "platformdirs": ("platformdirs", "4.11.7"),

@@ -138,6 +138,7 @@ name = "apple-tv-agent"
 version = "0.1.0a1"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "filelock" },
     { name = "keyring" },
     { name = "platformdirs" },
@@ -158,6 +159,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = "==3.14.3" },
     { name = "filelock", specifier = "==3.32.5" },
     { name = "keyring", specifier = "==25.7.0" },
     { name = "platformdirs", specifier = "==4.11.7" },

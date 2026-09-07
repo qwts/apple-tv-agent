@@ -40,7 +40,7 @@ Ordinary commands emit JSON. A control can be `confirmed` by matching observed s
 
 ## Limits and development
 
-Capabilities depend on the TV, active app and audio/display setup. The baseline CLI does not expose screenshots, screen reading, Siri, purchases, arbitrary deep links or internet remote access. An optional LG provider has [HDMI screenshot feasibility evidence](docs/lg-screen-capture-spike.md) and a [follow-up implementation plan](issues/011-lg-screen-observation.md); it is not yet a packaged capability.
+Capabilities depend on the TV, active app and audio/display setup. The baseline CLI does not expose screenshots, screen reading, Siri, purchases, arbitrary deep links or internet remote access. An optional LG provider has [HDMI screenshot feasibility evidence](docs/lg-screen-capture-spike.md) and a [follow-up implementation plan](issues/011-lg-screen-observation.md); capture is not yet a packaged capability. The experimental [LG discovery helper](docs/lg-discovery.md) can discover candidates and inspect an untrusted TLS fingerprint; it does not pair or capture yet.
 
 - [DESIGN.md](DESIGN.md): architecture, contracts and release boundaries.
 - [Issue backlog](issues/README.md): implementation plans and validation evidence.
