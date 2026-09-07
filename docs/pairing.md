@@ -20,7 +20,7 @@ Per-device native file locks serialize pairing and credential deletion. Candidat
 
 ## Reconnect validation
 
-The production status/control commands arrive in the next issues. From a checkout, verify persisted credentials in a separate process without pairing or device control:
+Production status/capabilities are now available; control actions arrive in the next issues. From a checkout, verify persisted credentials in a separate process without pairing or device control:
 
 ```sh
 python tools/verify_pairing.py --device DEVICE_UUID

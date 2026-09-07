@@ -6,6 +6,7 @@ import json
 import math
 import sys
 from collections.abc import Callable, Sequence
+from dataclasses import replace
 from ipaddress import IPv4Address
 from typing import BinaryIO
 
@@ -156,7 +157,8 @@ async def execute(service: Service, request: Request):
     if request.command == Command.PAIR:
         # Pairing owns separate human-input deadlines in issue 004.
         return await service.execute(request)
-    deadline = asyncio.timeout(request.timeout)
+    request = replace(request, deadline=asyncio.get_running_loop().time() + request.timeout)
+    deadline = asyncio.timeout_at(request.deadline)
     try:
         async with deadline:
             return await service.execute(request)

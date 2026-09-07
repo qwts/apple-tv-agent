@@ -65,7 +65,7 @@ def main():
         for argv, expected in [
             (["--version"], 0),
             (["--help"], 0),
-            (["status"], 4),
+            (["doctor"], 4),
             (["remote", "unknown-action"], 2),
         ]:
             results = [
@@ -80,7 +80,7 @@ def main():
                 "import json; from importlib.resources import files; "
                 "root = files('apple_tv_agent'); "
                 "print(json.dumps({name: root.joinpath(name).read_text(encoding='utf-8') "
-                "for name in ['response-v1.json', 'docs/registry.md', 'docs/pairing.md']}))",
+                "for name in ['response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md']}))",
             ],
             check=True,
             capture_output=True,
@@ -89,7 +89,7 @@ def main():
         )
         resources = json.loads(resource_result.stdout)
         check_schema(json.loads(resources["response-v1.json"]))
-        for guide in ("docs/registry.md", "docs/pairing.md"):
+        for guide in ("docs/registry.md", "docs/pairing.md", "docs/sessions.md"):
             if resources[guide] != (root / guide).read_text(encoding="utf-8"):
                 raise RuntimeError("Bundled recovery guide differs from the source.")
     print(

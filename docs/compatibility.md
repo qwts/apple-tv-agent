@@ -144,3 +144,7 @@ These package checks require no TV or persisted credentials. They establish inst
 On 2026-09-07, macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: the production CLI paired the reference Apple TV 4K (second generation, previously observed tvOS 26.2) over AirPlay and Companion using hidden local-terminal PIN entry. Verified credentials were saved to Keychain. A separate Python process read them only after rediscovered identity matched and authenticated both protocols; this read-only reconnect was repeated after connection cleanup changes. No playback/navigation actions were sent.
 
 The new opt-in native-vault test passed an isolated write, fresh-process read and verified deletion. The normal suite covers failures, rollback and cancellation with synthetic credentials; native Windows vault mutation and Windows 11 pairing/restart remain untested release gates. MRP pairing is implemented against the pinned API but has no hardware evidence in this run.
+
+## Production status/capabilities validation (issue 005)
+
+On 2026-09-07, macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: separate production CLI status and capability invocations connected to the registered reference TV using Keychain credentials and returned success JSON with empty stderr. Status observed playback `playing`. No re-pairing, playback or navigation action was sent. Windows 11 TV status/capability validation remains untested; simulated cross-platform tests are not a substitute for that hardware evidence.

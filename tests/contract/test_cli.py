@@ -187,6 +187,8 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
         for c in Command
         if c
         not in {
+            Command.STATUS,
+            Command.CAPABILITIES,
             Command.PAIR,
             Command.DEVICES_FORGET,
             Command.DISCOVER,
@@ -325,7 +327,7 @@ def test_entry_points_match_from_another_directory(tmp_path):
     )
     commands = [[str(console)], [sys.executable, "-m", "apple_tv_agent"]]
     results = [
-        subprocess.run(command + ["status"], cwd=tmp_path, capture_output=True)
+        subprocess.run(command + ["doctor"], cwd=tmp_path, capture_output=True)
         for command in commands
     ]
     assert results[0].stdout == results[1].stdout
