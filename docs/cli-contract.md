@@ -1,8 +1,8 @@
 # CLI and JSON contract v1
 
-Issue [002](../issues/002-package-contract.md) establishes the installable contract foundation. Issue [003](../issues/003-discovery-registry.md) adds live discovery and local registry list/alias/default operations. Other operational commands return `FEATURE_UNAVAILABLE` with `details.reason = not_implemented`. Noninteractive pairing returns `INTERACTIVE_REQUIRED` first. The test-only fake adapter is dependency-injected; there is no CLI option that returns simulated device success.
+Issue [002](../issues/002-package-contract.md) establishes the installable contract foundation. Issue [003](../issues/003-discovery-registry.md) adds live discovery and local registry list/alias/default operations. Issue [004](../issues/004-credentials-pairing.md) adds interactive pairing and local credential removal. Remaining status/control/diagnostic commands return `FEATURE_UNAVAILABLE` with `details.reason = not_implemented`. Noninteractive pairing returns `INTERACTIVE_REQUIRED` first. The test-only fake adapter is dependency-injected; there is no CLI option that returns simulated device success.
 
-Parsing arguments and local registry commands do not load pyatv or access a native vault. Discovery reads the LAN but does not pair or issue control commands. The separate [transport probe](compatibility.md) remains the opt-in hardware pairing/control feasibility tool.
+Parsing arguments and registry list/alias/default commands do not load pyatv or access a native vault. Forget uses the native vault but sends no network commands. Discovery reads the LAN but does not pair or issue control commands. The separate [transport probe](compatibility.md) remains the opt-in hardware pairing/control feasibility tool.
 
 ## Install and validate
 
@@ -119,4 +119,4 @@ Issue 003 implements registry/discovery; 004 implements native credentials/pairi
 
 ## Discovery and registry implementation
 
-`discover`, `devices list`, `devices alias`, and `devices default` now execute their services. See [registry usage and recovery](registry.md). Other device commands still return `FEATURE_UNAVAILABLE` with `reason=not_implemented`; noninteractive pairing still returns `INTERACTIVE_REQUIRED`. Discovery never registers a device; issue 004 will connect interactive pairing to the registration API.
+`discover`, `devices list`, `devices alias`, and `devices default` now execute their services. See [registry usage and recovery](registry.md). Pairing and `devices forget` are implemented; see [pairing and credential recovery](pairing.md). Remaining status/control commands return `FEATURE_UNAVAILABLE` with `reason=not_implemented`; noninteractive pairing still returns `INTERACTIVE_REQUIRED`. Discovery never registers a device; interactive pairing explicitly registers its selected candidate.

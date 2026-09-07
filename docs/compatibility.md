@@ -138,3 +138,9 @@ Windows selected `keyring.backends.Windows.WinVaultKeyring`; macOS selected `key
 [Run 34088665314](https://github.com/qwts/apple-tv-agent/actions/runs/34088665314), commit `fd0ea01`, passed on macOS and Windows runners with Python 3.12 and 3.14. Each job synchronized the universal dependency lock, checked native backend selection, passed Ruff and all **143 tests**, built a source distribution and wheel, then installed the wheel with hashed runtime dependencies in a fresh temporary virtual environment. Both CLI entry points and the bundled schema passed checks from a path containing spaces outside the checkout.
 
 These package checks require no TV or persisted credentials. They establish installation and contract behavior; the Windows 11 hardware and native-vault persistence gates in issue 001 remain open.
+
+## Persisted pairing validation (issue 004)
+
+On 2026-09-07, macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: the production CLI paired the reference Apple TV 4K (second generation, previously observed tvOS 26.2) over AirPlay and Companion using hidden local-terminal PIN entry. Verified credentials were saved to Keychain. A separate Python process read them only after rediscovered identity matched and authenticated both protocols; this read-only reconnect was repeated after connection cleanup changes. No playback/navigation actions were sent.
+
+The new opt-in native-vault test passed an isolated write, fresh-process read and verified deletion. The normal suite covers failures, rollback and cancellation with synthetic credentials; native Windows vault mutation and Windows 11 pairing/restart remain untested release gates. MRP pairing is implemented against the pinned API but has no hardware evidence in this run.

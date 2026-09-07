@@ -2,7 +2,7 @@
 
 An implementation blueprint for an agent skill that controls a local Apple TV from a macOS or Windows computer.
 
-**Status: discovery and local device registry implemented; pairing/control services and agent skill pending.** The installable package discovers TVs and manages registered device aliases/defaults. Registration is an internal pairing integration point; the `pair` command is still pending. Follow the [package setup and CLI contract](docs/cli-contract.md) and [discovery/registry guide](docs/registry.md). The separate [transport probe](docs/compatibility.md) has paired and controlled a real TV; the workflow below describes the intended completed product.
+**Status: discovery, device registry and native-vault pairing implemented; control services and agent skill pending.** Follow the [package setup](docs/cli-contract.md), [registry guide](docs/registry.md) and [interactive pairing guide](docs/pairing.md). Pairing runs in a local terminal with hidden PIN input; verified credentials remain in the native vault. Hardware support evidence and remaining Windows gates are tracked in [compatibility](docs/compatibility.md).
 
 ## Intended experience
 

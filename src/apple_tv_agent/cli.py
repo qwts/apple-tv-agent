@@ -156,8 +156,15 @@ async def execute(service: Service, request: Request):
     if request.command == Command.PAIR:
         # Pairing owns separate human-input deadlines in issue 004.
         return await service.execute(request)
-    async with asyncio.timeout(request.timeout):
-        return await service.execute(request)
+    deadline = asyncio.timeout(request.timeout)
+    try:
+        async with deadline:
+            return await service.execute(request)
+    except AgentError as error:
+        if deadline.expired():
+            # Services may translate cancellation to retain completed mutation details.
+            raise AgentError(ErrorCode.TIMEOUT, details=error.details) from None
+        raise
 
 
 def main(
@@ -177,7 +184,12 @@ def main(
         pairing_input = stdin if stdin is not None else sys.stdin
         if command == Command.PAIR and not pairing_input.isatty():
             raise AgentError(ErrorCode.INTERACTIVE_REQUIRED)
-        service = service_factory()
+        if command == Command.PAIR and service_factory is ContractService:
+            from apple_tv_agent.pin import read_pin
+
+            service = ContractService(pin_reader=lambda: read_pin(stream=pairing_input))
+        else:
+            service = service_factory()
         result = asyncio.run(execute(service, request))
         response = success(command, result.device_id, result.data)
         exit_code = 0
