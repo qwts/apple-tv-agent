@@ -35,8 +35,8 @@ jobs:
           uv run --locked --no-sync python tools/transport_probe.py environment
       - name: Lint and formatting
         run: |
-          uv run --locked --no-sync ruff check src tests/contract tools/generate_schema.py tools/check_wheel.py
-          uv run --locked --no-sync ruff format --check src tests/contract tools/generate_schema.py tools/check_wheel.py
+          uv run --locked --no-sync ruff check src tests/contract tests/unit tools/generate_schema.py tools/check_wheel.py
+          uv run --locked --no-sync ruff format --check src tests/contract tests/unit tools/generate_schema.py tools/check_wheel.py
       - name: Contract and probe tests without hardware
         run: uv run --locked --no-sync python -m pytest -q
       - name: Build source distribution and wheel with locked build dependencies

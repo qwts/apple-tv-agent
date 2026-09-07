@@ -1,7 +1,7 @@
 # 002: Create the Python package and JSON CLI contract
 
 GitHub: https://github.com/qwts/apple-tv-agent/issues/2
-Status: in review
+Status: complete (merged PR #12)
 Priority: P0
 Depends on: [001](001-transport-spike.md)
 

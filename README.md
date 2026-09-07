@@ -2,7 +2,7 @@
 
 An implementation blueprint for an agent skill that controls a local Apple TV from a macOS or Windows computer.
 
-**Status: CLI contract foundation implemented; device services pending.** The installable package validates requests and returns structured errors for unimplemented services. The agent skill is still pending. Follow the [package setup and CLI contract](docs/cli-contract.md) to build and test locally. The separate [transport probe](docs/compatibility.md) has been used to pair and control a real TV; the workflow below describes the intended completed product.
+**Status: discovery and local device registry implemented; pairing/control services and agent skill pending.** The installable package discovers TVs and manages registered device aliases/defaults. Registration is an internal pairing integration point; the `pair` command is still pending. Follow the [package setup and CLI contract](docs/cli-contract.md) and [discovery/registry guide](docs/registry.md). The separate [transport probe](docs/compatibility.md) has paired and controlled a real TV; the workflow below describes the intended completed product.
 
 ## Intended experience
 

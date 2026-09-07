@@ -58,7 +58,7 @@ def ipv4(value: str) -> str:
 
 def parser() -> Parser:
     root = Parser(
-        prog="apple-tv-agent", description="Apple TV command contract (services pending)."
+        prog="apple-tv-agent", description="Local Apple TV discovery and device management."
     )
     root.add_argument("--version", action="version", version=f"apple-tv-agent {__version__}")
 
