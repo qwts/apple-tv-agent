@@ -1,4 +1,4 @@
-"""Regenerate the checked-in response schema from the installed package models."""
+"""Regenerate the checked-in response and observation schemas from package models."""
 
 import json
 from pathlib import Path

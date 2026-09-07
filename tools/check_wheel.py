@@ -90,12 +90,11 @@ def main():
             env=env,
         )
         resources = json.loads(resource_result.stdout)
-        check_schema(json.loads(resources["response-v1.json"]))
-        check_schema(json.loads(resources["observation-v1.json"]))
-        if json.loads(resources["observation-v1.json"]) != json.loads(
-            (root / "schemas/observation-v1.json").read_text(encoding="utf-8")
-        ):
-            raise RuntimeError("Bundled observation schema differs from source.")
+        for name in ("response-v1.json", "observation-v1.json"):
+            bundled = json.loads(resources[name])
+            check_schema(bundled)
+            if bundled != json.loads((root / "schemas" / name).read_text(encoding="utf-8")):
+                raise RuntimeError(f"Bundled {name} differs from source.")
         for guide in (
             "docs/registry.md",
             "docs/pairing.md",

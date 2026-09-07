@@ -42,7 +42,7 @@ class ImageArtifact(FrozenModel):
     def validate_artifact(self):
         if self.width * self.height > MAX_IMAGE_PIXELS:
             raise ValueError("Image exceeds pixel limit")
-        # Accept either native host's absolute path, but never a network share or URL.
+        # Accept POSIX or Windows absolute paths on either host, never network shares or URLs.
         if (
             any(ord(c) < 32 or ord(c) == 127 for c in self.path)
             or self.path.startswith(("//", "\\\\"))
