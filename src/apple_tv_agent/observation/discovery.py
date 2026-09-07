@@ -231,20 +231,22 @@ async def discover(*, deadline: float, host: str | None = None) -> list[Candidat
         raise AgentError(ErrorCode.NETWORK_ERROR) from None
 
 
-async def inspect_certificate(host: str, *, deadline: float) -> str:
+async def inspect_certificate(host: str, *, deadline: float, port: int = 3001) -> str:
     """First-use inspection only. Sends no client key or application request.
 
     This deliberately unauthenticated handshake returns a fingerprint for local
     trust review. It must never be reused as an authenticated SSAP connection.
     """
     host = local_host(host)
+    if type(port) is not int or not 1 <= port <= 65535:
+        raise invalid()
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
     writer = None
     try:
         async with asyncio.timeout_at(deadline):
-            _, writer = await asyncio.open_connection(host, 3001, ssl=context, server_hostname=host)
+            _, writer = await asyncio.open_connection(host, port, ssl=context, server_hostname=host)
             tls = writer.get_extra_info("ssl_object")
             if tls is None:
                 raise OSError

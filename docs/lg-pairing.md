@@ -1,6 +1,6 @@
 # Trusted LG pairing and local credentials
 
-The experimental `apple-tv-screen` helper can discover/inspect, pair, list local registrations, verify a saved-key reconnect, and forget local credentials. HDMI association, screenshot download and visual skill integration remain future work under [issue 18](https://github.com/qwts/apple-tv-agent/issues/18). No Apple TV pairing or settings are changed by these commands.
+The experimental `apple-tv-screen` helper can discover/inspect, pair, list local registrations, verify a saved-key reconnect, and forget local credentials. Optional [HDMI association, one-shot capture and artifact cleanup](lg-capture.md) extend this pairing under [issue 18](https://github.com/qwts/apple-tv-agent/issues/18). No Apple TV pairing or settings are changed by these commands.
 
 ## Pair in your local terminal
 

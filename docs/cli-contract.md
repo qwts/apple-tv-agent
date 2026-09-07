@@ -13,7 +13,7 @@ macOS, from the repository root (select an installed Python >=3.12):
 ```sh
 python3.14 -m venv .venv
 .venv/bin/python -m pip install uv==0.12.10
-.venv/bin/uv sync --locked --python 3.14
+.venv/bin/uv sync --locked --extra screen --python 3.14
 .venv/bin/uv run --locked --no-sync apple-tv-agent --help
 .venv/bin/uv run --locked --no-sync python -m apple_tv_agent --version
 .venv/bin/uv run --locked --no-sync python -m pytest -q
@@ -27,7 +27,7 @@ Windows PowerShell:
 ```powershell
 py -3.14 -m venv .venv
 & .\.venv\Scripts\python.exe -m pip install uv==0.12.10
-& .\.venv\Scripts\uv.exe sync --locked --python 3.14
+& .\.venv\Scripts\uv.exe sync --locked --extra screen --python 3.14
 & .\.venv\Scripts\uv.exe run --locked --no-sync apple-tv-agent --help
 & .\.venv\Scripts\uv.exe run --locked --no-sync python -m apple_tv_agent --version
 & .\.venv\Scripts\uv.exe run --locked --no-sync python -m pytest -q
@@ -38,7 +38,7 @@ py -3.14 -m venv .venv
 
 `check_wheel.py` creates a fresh temporary virtual environment in a path containing spaces, installs hashed runtime requirements and the built wheel, then runs both entry points outside the checkout. It checks version/help, structured errors, exit codes and the bundled schema. Artifacts remain local in `dist/`; no package registry publication is performed.
 
-For deliberate dependency changes, edit `pyproject.toml`, run `uv lock`, then `uv sync --locked` and the validation commands. Commit metadata and `uv.lock` together. CI uses `--locked` so stale metadata/lock combinations fail instead of silently resolving new versions. To change one transitive dependency deliberately, use `uv lock --upgrade-package PACKAGE` and review the resulting lock diff. [uv documentation](https://docs.astral.sh/uv/concepts/projects/sync/)
+For deliberate dependency changes, edit `pyproject.toml`, run `uv lock`, then `uv sync --locked --extra screen` and the validation commands. Commit metadata and `uv.lock` together. CI uses `--locked` so stale metadata/lock combinations fail instead of silently resolving new versions. To change one transitive dependency deliberately, use `uv lock --upgrade-package PACKAGE` and review the resulting lock diff. [uv documentation](https://docs.astral.sh/uv/concepts/projects/sync/)
 
 ## Command arguments
 

@@ -34,6 +34,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--requirements", type=Path, required=True)
+    parser.add_argument("--screen-requirements", type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     wheels = list((root / "dist").glob("*.whl"))
@@ -90,6 +91,47 @@ def main():
                 json.loads(r.stdout)["error"]["code"] != "INVALID_ARGUMENT" for r in results
             ):
                 raise RuntimeError("Screen validation error differs from contract.")
+        missing_extra = subprocess.run(
+            [str(screen), "capture", "--binding", "00000000-0000-0000-0000-000000000001"],
+            capture_output=True,
+            cwd=base,
+            env=env,
+        )
+        if (
+            missing_extra.returncode != 6
+            or missing_extra.stderr
+            or "screen extra" not in json.loads(missing_extra.stdout)["error"]["message"]
+        ):
+            raise RuntimeError("Base wheel must fail clearly without the optional image decoder.")
+        if args.screen_requirements is not None:
+            subprocess.run(
+                [
+                    str(python),
+                    "-m",
+                    "pip",
+                    "install",
+                    "--require-hashes",
+                    "-r",
+                    str(args.screen_requirements.resolve()),
+                ],
+                check=True,
+                cwd=base,
+                env=env,
+            )
+            subprocess.run(
+                [
+                    str(python),
+                    "-c",
+                    "import io; from PIL import Image; "
+                    "from apple_tv_agent.observation.image_worker import decode; "
+                    "raw=io.BytesIO(); Image.new('RGB',(8,8),'white').save(raw,format='JPEG'); "
+                    "result=decode(raw.getvalue()); "
+                    "raise SystemExit(0 if result['quality']=='usable' else 1)",
+                ],
+                check=True,
+                cwd=base,
+                env=env,
+            )
         resource_result = subprocess.run(
             [
                 str(python),
@@ -97,7 +139,7 @@ def main():
                 "import json; from importlib.resources import files; "
                 "root = files('apple_tv_agent'); "
                 "print(json.dumps({name: root.joinpath(name).read_text(encoding='utf-8') "
-                "for name in ['observation-v1.json', 'response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md', 'docs/controls.md', 'docs/troubleshooting.md', 'docs/apps-keyboard.md', 'docs/lg-discovery.md', 'docs/lg-pairing.md', 'observation/lg-manifest.json', 'observation/bscpylgtv-LICENSE.txt']}))",
+                "for name in ['observation-v1.json', 'response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md', 'docs/controls.md', 'docs/troubleshooting.md', 'docs/apps-keyboard.md', 'docs/lg-discovery.md', 'docs/lg-pairing.md', 'docs/lg-capture.md', 'observation/lg-manifest.json', 'observation/bscpylgtv-LICENSE.txt']}))",
             ],
             check=True,
             capture_output=True,
@@ -119,6 +161,7 @@ def main():
             "docs/apps-keyboard.md",
             "docs/lg-discovery.md",
             "docs/lg-pairing.md",
+            "docs/lg-capture.md",
         ):
             if resources[guide] != (root / guide).read_text(encoding="utf-8"):
                 raise RuntimeError("Bundled recovery guide differs from the source.")

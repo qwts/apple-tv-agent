@@ -19,14 +19,15 @@ Candidate package version: `0.1.0a1`. **Development preview, not release-ready.*
 Use a clean checkout of the commit being assessed and the locked [setup instructions](../skills/apple-tv-control/references/setup.md). Run these from its repository root using that environment's absolute `uv` executable (shown as `uv` below). No global install or TV is required.
 
 ```text
-uv sync --locked --python 3.14
+uv sync --locked --extra screen --python 3.14
 uv pip check
 uv run --locked --no-sync ruff check src tests/contract tests/unit tests/integration tools/verify_pairing.py tools/generate_schema.py tools/check_wheel.py tools/check_skill.py tests/skill
 uv run --locked --no-sync ruff format --check src tests/contract tests/unit tests/integration tools/verify_pairing.py tools/generate_schema.py tools/check_wheel.py tools/check_skill.py tests/skill
 uv run --locked --no-sync python -m pytest -q
 uv run --locked --no-sync python -m build --no-isolation
 uv export --locked --no-dev --no-emit-project --output-file runtime-requirements.txt
-uv run --locked --no-sync python -O tools/check_wheel.py --requirements runtime-requirements.txt
+uv export --locked --extra screen --no-dev --no-emit-project --output-file screen-requirements.txt
+uv run --locked --no-sync python -O tools/check_wheel.py --requirements runtime-requirements.txt --screen-requirements screen-requirements.txt
 ```
 
 Repeat in a separate clean checkout/environment for Python 3.12. The committed [workflow](../.github/workflows/transport-probe.yml) performs both Python versions on both hosted OSes. Start with an empty `dist` directory; the wheel checker deliberately rejects multiple wheels. Record the commit, exact runtime versions, artifact names and SHA-256 hashes alongside results. Hashes identify bytes, not reproducible-build equivalence.

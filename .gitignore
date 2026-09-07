@@ -18,3 +18,5 @@ credentials*.json
 .local/
 
 runtime-requirements.txt
+
+screen-requirements.txt

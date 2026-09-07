@@ -1,6 +1,6 @@
 # Optional screen observation contract
 
-Issue [22](https://github.com/qwts/apple-tv-agent/issues/22), prerequisite for [18](https://github.com/qwts/apple-tv-agent/issues/18). The contract defines models and a provider interface. Experimental [LG discovery](lg-discovery.md) and [trusted pairing](lg-pairing.md) are implemented; capture remains unimplemented. The baseline Apple TV CLI and response-v1 schema remain unchanged; importing the observation package performs no network or vault access and requires no new dependencies.
+Issue [22](https://github.com/qwts/apple-tv-agent/issues/22), prerequisite for [18](https://github.com/qwts/apple-tv-agent/issues/18). The contract defines models and a provider interface. Experimental [LG discovery](lg-discovery.md) and [trusted pairing](lg-pairing.md) are implemented; [one-shot capture](lg-capture.md) now implements this boundary. The baseline Apple TV CLI and response-v1 schema remain unchanged; importing the observation package performs no network or vault access and requires no new dependencies.
 
 ## Contract
 
@@ -26,10 +26,12 @@ Images must be fully decoded JPEGs, no more than 10 MiB, no dimension above 8192
 6. Stream the full bounded response under the shared deadline. Check inputs around acquisition, decode bytes before publishing the artifact, and classify blank/unknown content conservatively. A full `read(n)` is not guaranteed to return the entire body. Persist only to a private provider-owned directory with exclusive creation and platform-appropriate access restrictions.
 7. Default artifact retention will be five minutes, with immediate explicit discard available. Track deletion deadlines in a private inventory, clean expired artifacts on every provider invocation, and explain that no background daemon means expiry is a cleanup target, not guaranteed deletion while the program is stopped. A future command must report cleanup failures. Never commit captures or enable continuous recording by default.
 
-## Remaining implementation sequence under issue 18
+## Implementation sequence under issue 18
 
 - **Discovery and trust registration:** separate LG registry, bounded SSDP/XML, certificate trust, permission manifest, local registration, native credential lifecycle, explicit binding commands. Validate synthetic off-device URLs, spoofed identity, certificate changes, vault failures and cancellation; test on the reference LG only after trust can be approved locally.
 - **One-shot capture service and CLI:** pinned SSAP/HTTP, input checks, bounded full JPEG decode, private artifact inventory/deletion, conservative quality flags and structured error envelope. Package optional dependencies/resources, test redirects, partial bodies, size/time limits, redaction and cleanup; perform a single authorized hardware capture.
 - **Skill integration and compatibility:** teach observe → identify target → one Apple TV action → observe, with clarification for ambiguous targets. Keep visual inference distinct from transport outcomes; no purchases, account changes or private-text submission inferred from a screen. Validate macOS/Windows installation and record hardware results separately. Update the skill only when callable capture exists.
 
 No parent acceptance criterion is complete merely because these models pass offline tests. Windows hardware, actual pinned capture, permission minimization and retention enforcement remain future work.
+
+Implementation note: the capture helper and skill integration now exist. The sequence above records the design requirements; current behavior, limits and remaining hardware evidence are in [LG capture](lg-capture.md).

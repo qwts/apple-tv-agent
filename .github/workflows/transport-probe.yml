@@ -28,7 +28,7 @@ jobs:
       - name: Install lock tooling
         run: python -m pip install uv==0.12.10
       - name: Install locked development environment
-        run: uv sync --locked --python ${{ matrix.python }}
+        run: uv sync --locked --extra screen --python ${{ matrix.python }}
       - name: Check dependencies and native backend selection
         run: |
           uv pip check
@@ -42,6 +42,8 @@ jobs:
       - name: Build source distribution and wheel with locked build dependencies
         run: uv run --locked --no-sync python -m build --no-isolation
       - name: Export hashed runtime dependencies
-        run: uv export --locked --no-dev --no-emit-project --output-file runtime-requirements.txt
+        run: |
+          uv export --locked --no-dev --no-emit-project --output-file runtime-requirements.txt
+          uv export --locked --extra screen --no-dev --no-emit-project --output-file screen-requirements.txt
       - name: Verify clean wheel installation and both entry points
-        run: uv run --locked --no-sync python tools/check_wheel.py --requirements runtime-requirements.txt
+        run: uv run --locked --no-sync python tools/check_wheel.py --requirements runtime-requirements.txt --screen-requirements screen-requirements.txt

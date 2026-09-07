@@ -11,6 +11,7 @@ from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.observation.discovery import local_host
 
 READS = {
+    "capture": "ssap://tv/executeOneShot",
     "system": "ssap://system/getSystemInfo",
     "foreground": "ssap://com.webos.applicationManager/getForegroundAppInfo",
 }
