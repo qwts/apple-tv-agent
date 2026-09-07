@@ -24,6 +24,13 @@ class ProbeError(Exception):
     """Only fixed, nonsecret codes cross the output boundary."""
 
 
+class ActionState:
+    """Track possible playback dispatch for one CLI invocation."""
+
+    def __init__(self):
+        self.attempted = False
+
+
 def native_vault():
     backend = keyring.get_keyring()
     expected = {
@@ -196,7 +203,10 @@ async def pair_once(device, protocol, storage, timeout):
             await handler.close()
 
 
-async def inspect_connection(device, storage, timeout, pause=False, play=False):
+async def inspect_connection(device, storage, timeout, pause=False, play=False,
+                             action_state=None):
+    if action_state is None:
+        action_state = ActionState()
     if pause and play:
         raise ProbeError("CONFLICTING_ACTIONS")
     connection = None
@@ -229,14 +239,18 @@ async def inspect_connection(device, storage, timeout, pause=False, play=False):
                 ):
                     raise ProbeError("PAUSE_UNAVAILABLE")
                 # No mutation retry; successful dispatch alone is not confirmation.
-                await connection.remote_control.pause()
+                operation = connection.remote_control.pause
+                action_state.attempted = True
+                await operation()
                 result["pause_outcome"] = "sent"
             if play:
                 if not connection.features.in_state(
                     FeatureState.Available, FeatureName.Play
                 ):
                     raise ProbeError("PLAY_UNAVAILABLE")
-                await connection.remote_control.play()
+                operation = connection.remote_control.play
+                action_state.attempted = True
+                await operation()
                 result["play_outcome"] = "sent"
                 observed = await connection.metadata.playing()
                 result["playback_state_after"] = observed.device_state.name.lower()
@@ -251,7 +265,7 @@ async def inspect_connection(device, storage, timeout, pause=False, play=False):
                     await asyncio.gather(*tasks)
 
 
-async def network_probe(args):
+async def network_probe(args, action_state=None):
     if args.command == "session" and not sys.stdin.isatty():
         raise ProbeError("INTERACTIVE_REQUIRED")
     storage = MemoryStorage()
@@ -269,7 +283,9 @@ async def network_probe(args):
     device = matches[0]
     for name in args.protocol:
         await pair_once(device, Protocol[name], storage, args.timeout)
-    return await inspect_connection(device, storage, args.timeout, args.pause, args.play)
+    return await inspect_connection(
+        device, storage, args.timeout, args.pause, args.play, action_state
+    )
 
 
 def ipv4(value):
@@ -313,21 +329,24 @@ def parser():
 def main(argv=None):
     logging.disable(logging.CRITICAL)  # Library debug records can contain protocol secrets.
     args = parser().parse_args(argv)
+    action_state = ActionState()
     try:
         if args.command == "environment":
             data = environment()
         elif args.command == "vault-roundtrip":
             data = vault_roundtrip()
         else:
-            data = asyncio.run(network_probe(args))
+            data = asyncio.run(network_probe(args, action_state))
         print(json.dumps({"ok": True, "data": data}))
         return 0
     except (Exception, KeyboardInterrupt) as error:
         # Exception messages may contain credentials. Never print repr or traceback.
         code = str(error) if isinstance(error, ProbeError) else type(error).__name__
+        outcome = None
+        if getattr(args, "pause", False) or getattr(args, "play", False):
+            outcome = "unknown" if action_state.attempted else "not_sent"
         print(json.dumps({"ok": False, "error": code,
-                          "outcome": "unknown" if (getattr(args, "pause", False)
-                                                    or getattr(args, "play", False)) else None}))
+                          "outcome": outcome}))
         return 1
 
 

@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import contextmanager
 import importlib.util
+import json
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
@@ -50,6 +51,7 @@ def test_errors_do_not_leak_exception_text(monkeypatch, capsys):
     output = capsys.readouterr()
     assert "secret-sentinel" not in output.out + output.err
     assert "RuntimeError" in output.out
+    assert json.loads(output.out)["outcome"] is None
 
 
 def test_discovery_allowlists_output():
@@ -163,3 +165,60 @@ def test_invalid_network_arguments(arguments):
     with pytest.raises(SystemExit) as error:
         probe.parser().parse_args(arguments)
     assert error.value.code == 2
+
+
+@pytest.mark.parametrize("action,phase", [
+    (action, phase)
+    for action in ("pause", "play")
+    for phase in ("discovery", "pairing", "connection", "capability", "dispatch", "cleanup")
+] + [("play", "readback")])
+def test_cli_failure_outcome_tracks_dispatch(monkeypatch, capsys, action, phase):
+    """Exercise the full CLI path, including failure before and after mutation."""
+    monkeypatch.setattr(probe.sys.stdin, "isatty", lambda: True)
+    device = SimpleNamespace(all_identifiers=["test-device"])
+    scan = AsyncMock(return_value=[device])
+    pairing = AsyncMock()
+    remote = SimpleNamespace(pause=AsyncMock(), play=AsyncMock())
+    playing = SimpleNamespace(device_state=SimpleNamespace(name="Paused"))
+    connection = SimpleNamespace(
+        features=Mock(),
+        metadata=SimpleNamespace(playing=AsyncMock(return_value=playing)),
+        remote_control=remote,
+        close=Mock(return_value=set()),
+    )
+    connection.features.all_features.return_value = {}
+    connection.features.in_state.side_effect = (
+        lambda state, name: phase != "capability"
+        and name == getattr(FeatureName, action.capitalize())
+    )
+    connect = AsyncMock(return_value=connection)
+    monkeypatch.setattr(probe.pyatv, "scan", scan)
+    monkeypatch.setattr(probe, "pair_once", pairing)
+    monkeypatch.setattr(probe.pyatv, "connect", connect)
+    failure = RuntimeError("secret-sentinel")
+    if phase == "discovery":
+        scan.side_effect = failure
+    elif phase == "pairing":
+        pairing.side_effect = failure
+    elif phase == "connection":
+        connect.side_effect = failure
+    elif phase == "dispatch":
+        getattr(remote, action).side_effect = failure
+    elif phase == "readback":
+        connection.metadata.playing.side_effect = [playing, failure]
+    elif phase == "cleanup":
+        connection.close.side_effect = failure
+
+    assert probe.main([
+        "session", "--identifier", "test-device", "--protocol", "AirPlay", f"--{action}",
+    ]) == 1
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    dispatched = phase in ("dispatch", "readback", "cleanup")
+    assert result["ok"] is False
+    assert result["outcome"] == ("unknown" if dispatched else "not_sent")
+    assert getattr(remote, action).await_count == int(dispatched)
+    assert getattr(remote, "play" if action == "pause" else "pause").await_count == 0
+    assert "secret-sentinel" not in output.out + output.err
+    if phase not in ("discovery", "pairing", "connection"):
+        connection.close.assert_called_once()

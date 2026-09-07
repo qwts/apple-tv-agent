@@ -100,6 +100,13 @@ The session reads capabilities, playback state and available keyboard focus. Add
 
 Do not commit raw discovery output, PINs, credentials, device identifiers, network addresses or media text as evidence. Record model/tvOS and sanitized outcomes manually.
 
+For a requested Play/Pause, a failed probe reports `outcome: not_sent` when it
+fails before playback dispatch (including discovery, pairing and capability
+checks). Once dispatch starts, a subsequent dispatch, readback or cleanup failure
+reports `outcome: unknown`. This field describes the requested playback action,
+not side effects of pairing itself. Errors without a requested playback action
+keep `outcome: null`.
+
 ## Remaining gates and next steps
 
 1. Keep the remaining validation work on the issue-specific branch and record results in the PR before declaring issue 001 complete.

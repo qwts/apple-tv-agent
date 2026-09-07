@@ -47,3 +47,9 @@ Issue remains in progress; the automated probe checks do not satisfy the hardwar
 - Resume follow-up: local Terminal re-pairing succeeded after a user-requested retry; user confirmed Play worked. No automatic mutation retry.
 
 - Hosted CI: [run 34085123063](https://github.com/qwts/apple-tv-agent/actions/runs/34085123063) passed installation, dependency consistency, native backend selection and all 17 tests on macOS 26.6.2 arm64 and Windows Server 2025 AMD64, each with Python 3.12.10 and 3.14.7. Windows 11 hardware and native-vault write/read/delete remain unverified.
+
+- PR review fix: track attempted playback dispatch per invocation. Errors before
+  dispatch report `not_sent`; errors after dispatch starts report `unknown`.
+  Regression coverage exercises Play/Pause through the CLI across discovery,
+  pairing, connection, capability, dispatch, readback and cleanup failures. Local
+  validation: `python -m pytest -q` — **30 passed**.
