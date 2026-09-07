@@ -149,11 +149,18 @@ class PairingService:
                 )
             try:
                 cleared = await self.registry.remove(device_id)
-            except AgentError as error:
+            except (AgentError, TimeoutError, asyncio.CancelledError) as error:
+                if isinstance(error, AgentError):
+                    code, details = error.code, error.details
+                elif isinstance(error, TimeoutError):
+                    code, details = ErrorCode.TIMEOUT, {}
+                else:
+                    code, details = ErrorCode.CONFIG_ERROR, {"reason": "canceled"}
                 raise AgentError(
-                    error.code,
+                    code,
                     details={
-                        **error.details,
+                        **details,
+                        "recovery": "Retry devices forget with this device UUID.",
                         "device_id": device_id,
                         "local_credentials_removed": True,
                         "registry_removed": False,

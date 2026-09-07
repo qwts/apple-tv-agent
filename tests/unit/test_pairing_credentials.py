@@ -419,3 +419,55 @@ def test_library_debug_secrets_are_suppressed_during_pairing(setup, capsys, capl
         run(service.pair(request(candidate)))
     out = capsys.readouterr()
     assert secret not in out.out + out.err + caplog.text + str(error.value.details)
+
+
+@pytest.mark.parametrize("interrupt", ["deadline", "cancel", "timeout_error"])
+def test_forget_interruption_retains_completed_deletion_and_uuid_recovery(
+    setup, monkeypatch, interrupt
+):
+    from filelock import FileLock
+
+    from apple_tv_agent.cli import execute
+
+    service, candidate = setup
+    paired = run(service.pair(request(candidate)))
+    run(service.registry.set_default(paired.device_id))
+    original_remove = service.registry.remove
+
+    async def exercise():
+        waiting = asyncio.Event()
+
+        async def blocked_remove(device_id):
+            if interrupt == "timeout_error":
+                raise TimeoutError
+            with FileLock(str(service.registry.path) + ".lock"):
+                waiting.set()
+                return await original_remove(device_id)
+
+        monkeypatch.setattr(service.registry, "remove", blocked_remove)
+        req = Request(
+            Command.DEVICES_FORGET,
+            device=paired.device_id,
+            timeout=0.05 if interrupt == "deadline" else 10,
+        )
+        task = asyncio.create_task(execute(SimpleNamespace(execute=service.forget), req))
+        if interrupt == "cancel":
+            await asyncio.wait_for(waiting.wait(), timeout=1)
+            task.cancel()
+        with pytest.raises(AgentError) as error:
+            await task
+        assert error.value.code == (
+            ErrorCode.CONFIG_ERROR if interrupt == "cancel" else ErrorCode.TIMEOUT
+        )
+        assert error.value.details["device_id"] == paired.device_id
+        assert error.value.details["local_credentials_removed"] is True
+        assert error.value.details["registry_removed"] is False
+        assert "UUID" in error.value.details["recovery"]
+        assert not service.vault.values
+        assert (await service.registry.snapshot()).default_device_id == paired.device_id
+        monkeypatch.setattr(service.registry, "remove", original_remove)
+        retried = await service.forget(req)
+        assert retried.data.registry_removed is True
+        assert retried.data.default_cleared is True
+
+    run(exercise())

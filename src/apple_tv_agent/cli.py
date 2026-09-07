@@ -156,8 +156,15 @@ async def execute(service: Service, request: Request):
     if request.command == Command.PAIR:
         # Pairing owns separate human-input deadlines in issue 004.
         return await service.execute(request)
-    async with asyncio.timeout(request.timeout):
-        return await service.execute(request)
+    deadline = asyncio.timeout(request.timeout)
+    try:
+        async with deadline:
+            return await service.execute(request)
+    except AgentError as error:
+        if deadline.expired():
+            # Services may translate cancellation to retain completed mutation details.
+            raise AgentError(ErrorCode.TIMEOUT, details=error.details) from None
+        raise
 
 
 def main(

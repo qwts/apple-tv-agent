@@ -48,3 +48,7 @@ When complete, record changed files, exact validation commands and results, host
 The acceptance checks above have macOS hardware and deterministic failure-path evidence. Native Windows vault operations and Windows 11 TV pairing/restart, real invalid-PIN/locked-vault recovery, and remaining physical controls are not claimed tested; Windows hardware/native-vault release gates remain in issue 001. CI runs the fake-backed suite on both OSes and explicitly skips native vault mutation.
 
 See [pairing and recovery](../docs/pairing.md) and the opt-in [reconnect tool](../tools/verify_pairing.py).
+
+### Review follow-up
+
+Preserve completed vault-deletion details and UUID recovery when registry removal times out or is canceled. The CLI retains those details while classifying its own expired deadline as `TIMEOUT`. Regression tests use a contended registry lock, exercise task cancellation and timeout, and verify UUID retry clears the retained default. Local suite: **227 passed, 1 native-vault test skipped**.
