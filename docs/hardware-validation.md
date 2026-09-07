@@ -1,16 +1,16 @@
 # Opt-in hardware release validation
 
-Issue [010](../issues/010-validation-release.md) remains open until both native host baselines pass. Run this checklist manually on macOS and Windows 11 x64; hosted Windows Server CI cannot replace Windows 11, LAN or credential-store evidence. Never schedule these controls in unattended CI.
+Issue [010](../issues/010-validation-release.md) remains open until all native host baselines pass. Run this checklist manually on macOS arm64/x86_64, Windows 11 x64 and Linux x86_64 with a desktop Secret Service keyring; hosted Windows Server CI cannot replace Windows 11, LAN or credential-store evidence. Never schedule these controls in unattended CI.
 
 ## Isolation and preparation
 
-Use a dedicated local OS test account on each host. A new virtual environment alone does **not** isolate the registry or native credential store. Do not repoint HOME, copy production credentials, or delete an existing user's registry. Pair each account independently. Use a reference TV whose viewer has agreed to interruptions; record its original app, playback, volume and power state locally for restoration.
+Use a dedicated local OS test account on each target host. A new virtual environment alone does **not** isolate the registry or native credential store. Do not repoint HOME, copy production credentials, or delete an existing user's registry. Pair each account independently. Use a reference TV whose viewer has agreed to interruptions; record its original app, playback, volume and power state locally for restoration.
 
 Record date, commit, OS version/architecture, Python and pyatv versions, TV model/tvOS, wired/Wi-Fi topology, and audio route (TV speakers, receiver or other). Omit addresses, identifiers, account names, media titles and credentials from shared evidence. Record whether each result came from JSON, a physical observation or both.
 
 Follow the [locked setup](../skills/apple-tv-control/references/setup.md) from a fresh checkout in a path containing spaces. Below, `apple-tv-agent` and `python` mean the absolute executables in that environment, not an assumed PATH entry. Bare subcommands below are shorthand for that absolute CLI executable followed by the subcommand: for example, `discover --timeout 15` means `apple-tv-agent discover --timeout 15`. Run `doctor`; inspect each check, since completed diagnostics can exit zero even when a check fails.
 
-## Baseline on each host
+## Baseline on each target host
 
 1. Run `discover --timeout 15`. Record candidate count and whether the reference TV appears. If empty, approve any locally displayed firewall prompt and repeat once; separately try `discover --host TV_IPV4`. Record multicast and targeted results independently, without claiming a cause from an empty scan.
 2. In a local interactive terminal, run `pair --device CANDIDATE_ID` with a fresh candidate ID. Enter PINs only at hidden prompts. Record verified protocol names and any partial failure. Run `devices list` and retain the resulting registered UUID privately.
@@ -18,7 +18,7 @@ Follow the [locked setup](../skills/apple-tv-control/references/setup.md) from a
 4. With playback active and the capability available, send `remote pause --device UUID` once. Observe whether playback pauses; record the JSON outcome separately. Send `remote play --device UUID` once and observe restoration. Never repeat a possibly dispatched mutation automatically.
 5. On a harmless visible menu, send one `remote right --device UUID`, observe the focus move, then one `remote left --device UUID` to restore it. Test `select`, `menu` and `home` separately with known screen context; record their actual behavior. A feature name alone is not evidence of Home semantics.
 
-Baseline discovery, pairing, status, pause and navigation must pass on both host OSes before declaring release readiness. A failure blocks readiness; an untested baseline also blocks readiness.
+Baseline discovery, pairing, status, pause and navigation must pass on all three host OSes and each shipped architecture before declaring release readiness. A failure blocks readiness; an untested baseline also blocks readiness.
 
 ## Capability and recovery matrix
 
@@ -68,3 +68,7 @@ Local credential removal / TV pairing cleanup / state restoration:
 Per-case result and JSON vs physical observation:
 Remaining failures or not-tested cases:
 ```
+
+## Linux release extension
+
+Issue #30 extends these gates to Linux. Record distro/glibc, desktop session, Secret Service provider and locked/unavailable-service behavior. Use a dedicated desktop account and independently pair Apple TV and optional LG; test credential persistence and verified removal. Headless CI with no Secret Service must fail clearly without plaintext fallback and is not native keyring evidence. Run the extracted release bundle as well as source tests. Set release-gates.json only after evidence covers the exact release version and every target.

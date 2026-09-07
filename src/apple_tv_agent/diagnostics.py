@@ -70,8 +70,8 @@ class DoctorService:
             )
             add(
                 "host",
-                "pass" if sys.platform in ("darwin", "win32") else "fail",
-                "Native macOS or Windows is required for credential storage; hardware validation is separate.",
+                "pass" if sys.platform in ("darwin", "win32", "linux") else "fail",
+                "macOS, Windows or Linux with Secret Service is required; hardware validation is separate.",
             )
             add(
                 "executable_context",
@@ -110,7 +110,7 @@ class DoctorService:
                 add(
                     "native_backend",
                     "fail",
-                    "Native credential backend unavailable. Use macOS Keychain or Windows Credential Manager in your signed-in desktop session; see docs/troubleshooting.md.",
+                    "Native credential backend unavailable. Use macOS Keychain, Windows Credential Manager or Linux Secret Service with D-Bus and an unlocked keyring in your signed-in desktop session; see docs/troubleshooting.md.",
                 )
             else:
                 add(

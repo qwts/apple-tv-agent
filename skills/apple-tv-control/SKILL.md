@@ -1,6 +1,6 @@
 ---
 name: apple-tv-control
-description: Control a local Apple TV from a Mac or Windows computer using the apple-tv-agent CLI. Use for discovery, pairing guidance, playback, remote buttons, power, volume, installed-app launch, typing into a focused TV input, or optional paired-LG HDMI screenshot guidance. Not for Apple TV+ catalog questions or web streaming.
+description: Control a local Apple TV from macOS, Windows or a Linux desktop with Secret Service using the apple-tv-agent CLI. Use for discovery, pairing guidance, playback, remote buttons, power, volume, installed-app launch, typing into a focused TV input, or optional paired-LG HDMI screenshot guidance. Not for Apple TV+ catalog questions or web streaming.
 ---
 
 # Apple TV control

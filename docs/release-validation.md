@@ -46,3 +46,7 @@ On macOS 26.6.2 arm64 / Python 3.14.7, the issue 010 branch passed Ruff checks/f
 | `apple_tv_agent-0.1.0a1.tar.gz` | `6e0b072ce26cd8b24cc1c785513cb7ae54d45e42761e9c4e4bd281fe44776ac1` |
 
 The artifacts were built after the README/registry guide edits and before adding this repository-only evidence section. No hardware mutations or client skill installation were performed for this documentation change.
+
+## Native release bundles
+
+[Issue #30](https://github.com/qwts/apple-tv-agent/issues/30) adds separate native archive build/download/smoke jobs for macOS arm64/x86_64, Windows x86_64 and Linux x86_64. See [release pipeline](release-pipeline.md) for version tags, draft publication and recovery. Linux desktop pairing/Secret Service persistence and both-host historical gaps remain untested. Stable tags require the exact version and all targets passed in release-gates.json; all values currently remain not-tested. The local Mac arm64 bundle passed extraction in a path containing spaces, both CLI entry points, dynamic dependency/resource checks and frozen JPEG subprocess execution with no Python on PATH. This is software evidence, not a new TV hardware run.

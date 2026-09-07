@@ -12,7 +12,7 @@ def vault_error(reason="vault_unavailable"):
         ErrorCode.CREDENTIAL_STORE_UNAVAILABLE,
         details={
             "reason": reason,
-            "recovery": "Unlock the native vault and allow this Python application access, then retry locally.",
+            "recovery": "Unlock the native vault and allow this application access, then retry locally. On Linux, use a signed-in desktop session with D-Bus and an unlocked Secret Service keyring; headless sessions without that service are unsupported.",
         },
     )
 
@@ -33,6 +33,10 @@ class NativeCredentialStore:
                 from keyring.backends.Windows import WinVaultKeyring
 
                 expected = WinVaultKeyring
+            elif sys.platform == "linux":
+                from keyring.backends.SecretService import Keyring
+
+                expected = Keyring
             else:
                 raise vault_error("native_backend_required")
             if type(backend) is not expected:

@@ -158,3 +158,7 @@ On the same macOS 26.6.2 arm64 host, Python 3.14.7 and pyatv 0.18.0 reconnected 
 ### App listing and launch (2026-09-07)
 
 The reference macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0 host retrieved 28 launchable apps using saved credentials. A single launch of the exact installed Netflix bundle ID completed with sent and empty stderr. This confirms transport completion only; the visible foreground app was not independently confirmed. Intentional focused-field keyboard typing and Windows 11 hardware remain untested. Automated suite: 391 passed, one native-vault opt-in skip.
+
+## Release bundle targets
+
+The release pipeline now targets macOS arm64/x86_64, Windows x86_64 and Linux x86_64. See [downloads](downloads.md) for baseline OS/architecture and unsigned preview limits. Linux native Secret Service selection is implemented with no plaintext fallback; Linux TV pairing, secure-vault persistence and native controls remain not-tested. Archive smoke tests do not replace the full hardware matrix.

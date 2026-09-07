@@ -1,7 +1,7 @@
 # 016: Build versioned GitHub releases for macOS, Windows and Linux
 
 GitHub: https://github.com/qwts/apple-tv-agent/issues/30
-Status: open
+Status: in review
 Priority: P1
 Depends on: existing package/skill implementation; coordinate release gates with #1, #10 and #18
 
@@ -36,3 +36,9 @@ Users can select their OS and architecture on GitHub Releases, download a versio
 ## Validation plan
 
 Test workflow/version logic with valid, mismatched and prerelease versions; exercise matrix failure and rerun handling without publishing a stable release. Run bundle smoke tests on native hosted runners and verify a downloaded preview asset, not just the build directory. Record exact OS, architecture, version, commit and asset hashes. Record real-device pairing/reconnect/control and credential cleanup separately on each claimed platform. A missing host or native keyring session is not a passing result.
+
+## Implementation evidence
+
+The release workflow builds four native archives and Python packages, downloads archives on fresh jobs, and gates draft-only tag releases on all validation jobs plus strict asset checks. PyInstaller onedir bundles include both commands, portable skill, schemas/guides, license notices and frozen-worker support. Linux Secret Service is an exact allowed backend; unavailable sessions fail without plaintext fallback. Stable version tags require version-specific native validation in release-gates.json. See [pipeline maintenance](../docs/release-pipeline.md).
+
+Local Mac arm64 archive extraction/commands/dependency metadata and JPEG subprocess smoke checks passed with no Python on the application PATH. Native Windows/Linux pairing and complete hardware matrices remain open; no release tag or public release has been created. Publisher code signing/notarization is not configured; preview bundles explicitly disclose unsigned/ad-hoc status.

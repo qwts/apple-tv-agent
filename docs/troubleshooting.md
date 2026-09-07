@@ -39,3 +39,7 @@ Check the active network's Public/Private classification before assuming an exce
 | FEATURE_UNAVAILABLE / UNSUPPORTED_FEATURE | Inspect capabilities and current app/state; do not substitute a guessed control. |
 
 See [pairing recovery](pairing.md) and [control outcomes](controls.md). Diagnostic output is intentionally limited; never attach native-vault exports, pairing logs or screenshots with private content as issue evidence.
+
+## Linux desktop keyring
+
+Linux requires a signed-in D-Bus session and an unlocked Secret Service provider such as GNOME Keyring. Install session prerequisites through the distribution and unlock the collection locally. Headless sessions without this service return CREDENTIAL_STORE_UNAVAILABLE; there is no plaintext fallback and the agent does not initialize or unlock a desktop session. Both Apple TV and LG stores use this same validated backend with separate namespaces.
