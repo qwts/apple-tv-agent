@@ -370,3 +370,55 @@ def test_bind_same_certificate_does_not_reprompt(setup, monkeypatch):
     assert result["binding"]["hdmi_input"] == "com.webos.app.hdmi3"
     assert result["binding"]["binding_id"] != str(binding.binding_id)
     approval.assert_not_called()
+
+
+def test_bind_saved_image_certificate_does_not_reprompt(setup, monkeypatch):
+    service, binding = setup
+    monkeypatch.setattr(
+        capture, "read", AsyncMock(return_value={"imageUri": "https://192.168.1.10/frame"})
+    )
+    monkeypatch.setattr(capture, "inspect_certificate", AsyncMock(return_value="b" * 64))
+    approval = AsyncMock(side_effect=AgentError(ErrorCode.INTERACTIVE_REQUIRED))
+    result = asyncio.run(
+        service.bind(binding.lg_device_id, binding.apple_tv_id, 4, approval=approval)
+    )
+    assert result["binding"]["binding_id"] == str(binding.binding_id)
+    approval.assert_not_called()
+
+
+def test_provider_discard_lock_timeout_is_fixed_error(setup):
+    service, binding = setup
+
+    async def run():
+        observation = await service.observe(
+            binding, deadline=asyncio.get_running_loop().time() + 10
+        )
+        async with service.artifacts.registry.transaction():
+            with pytest.raises(AgentError) as error:
+                await service.discard(
+                    observation, deadline=asyncio.get_running_loop().time() + 0.02
+                )
+            assert error.value.code == ErrorCode.TIMEOUT
+        assert service.artifacts.path(observation.observation_id).exists()
+        await service.discard(observation, deadline=asyncio.get_running_loop().time() + 2)
+
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("length", [0, 32768, 40000, 19])
+def test_windows_system_directory_ignores_environment(monkeypatch, length):
+    from apple_tv_agent.observation import artifacts
+
+    def get_directory(buffer, size):
+        buffer.value = "C:\\Windows\\System32"
+        return length
+
+    kernel = Mock()
+    kernel.GetSystemDirectoryW = Mock(side_effect=get_directory)
+    monkeypatch.setattr(artifacts.ctypes, "WinDLL", Mock(return_value=kernel), raising=False)
+    monkeypatch.setenv("SystemRoot", "C:\\untrusted")
+    if length == 19:
+        assert str(artifacts.windows_system_directory()) == "C:\\Windows\\System32"
+    else:
+        with pytest.raises(AgentError):
+            artifacts.windows_system_directory()

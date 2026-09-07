@@ -20,6 +20,20 @@ from apple_tv_agent.models import Model
 from apple_tv_agent.observation.registry import LGRegistry
 
 
+def windows_system_directory():
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    get_directory = kernel.GetSystemDirectoryW
+    get_directory.argtypes = [wintypes.LPWSTR, wintypes.UINT]
+    get_directory.restype = wintypes.UINT
+    buffer = ctypes.create_unicode_buffer(32768)
+    length = get_directory(buffer, len(buffer))
+    if not length or length >= len(buffer):
+        raise AgentError(ErrorCode.CONFIG_ERROR)
+    return Path(buffer.value)
+
+
 def private_directory(path):
     path = Path(path)
     path.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -36,7 +50,7 @@ def private_directory(path):
         path.chmod(0o700)
         return
     # Replace, rather than append to, the directory DACL. Only the current SID inherits access.
-    whoami = Path(os.environ["SystemRoot"]) / "System32/whoami.exe"
+    whoami = windows_system_directory() / "whoami.exe"
     result = subprocess.run(
         [str(whoami), "/user", "/fo", "csv", "/nh"],
         capture_output=True,

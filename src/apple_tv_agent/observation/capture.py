@@ -99,7 +99,19 @@ class CaptureService:
                     info = await read(ws, "capture")
                     port = image_url(info.get("imageUri"), record.host)
                 fingerprint = await inspect_certificate(record.host, port=port, deadline=deadline)
-            if fingerprint != record.certificate_sha256:
+                saved_bindings = await self.bindings.snapshot()
+                trusted_binding = next(
+                    (
+                        r
+                        for r in saved_bindings.bindings
+                        if str(r.binding.apple_tv_id) == str(apple_id)
+                        and str(r.binding.lg_device_id) == str(device_id)
+                        and r.image_port == port
+                        and r.image_certificate_sha256 == fingerprint
+                    ),
+                    None,
+                )
+            if fingerprint != record.certificate_sha256 and trusted_binding is None:
                 # Only certificate inspection happened; no image URL/request sent to this service yet.
                 candidate = Candidate(
                     record.host, record.udn, f"LG HTTPS image service, port {port}", "image-service"
@@ -170,8 +182,11 @@ class CaptureService:
             self.artifacts.path(observation.observation_id).absolute()
         ):
             raise AgentError(ErrorCode.CONFIG_ERROR)
-        async with asyncio.timeout_at(deadline):
-            await self.artifacts.discard(observation.observation_id)
+        try:
+            async with asyncio.timeout_at(deadline):
+                await self.artifacts.discard(observation.observation_id)
+        except TimeoutError:
+            raise AgentError(ErrorCode.TIMEOUT) from None
 
     async def capture(self, binding_id, timeout=15, *, expected_binding=None):
         require_decoder()
