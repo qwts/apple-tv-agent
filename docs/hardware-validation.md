@@ -8,7 +8,7 @@ Use a dedicated local OS test account on each host. A new virtual environment al
 
 Record date, commit, OS version/architecture, Python and pyatv versions, TV model/tvOS, wired/Wi-Fi topology, and audio route (TV speakers, receiver or other). Omit addresses, identifiers, account names, media titles and credentials from shared evidence. Record whether each result came from JSON, a physical observation or both.
 
-Follow the [locked setup](../skills/apple-tv-control/references/setup.md) from a fresh checkout in a path containing spaces. Below, `apple-tv-agent` and `python` mean the absolute executables in that environment, not an assumed PATH entry. Run `doctor`; inspect each check, since completed diagnostics can exit zero even when a check fails.
+Follow the [locked setup](../skills/apple-tv-control/references/setup.md) from a fresh checkout in a path containing spaces. Below, `apple-tv-agent` and `python` mean the absolute executables in that environment, not an assumed PATH entry. Bare subcommands below are shorthand for that absolute CLI executable followed by the subcommand: for example, `discover --timeout 15` means `apple-tv-agent discover --timeout 15`. Run `doctor`; inspect each check, since completed diagnostics can exit zero even when a check fails.
 
 ## Baseline on each host
 
