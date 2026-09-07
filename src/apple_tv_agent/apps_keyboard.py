@@ -31,8 +31,10 @@ async def list_apps(session):
 async def dispatch(session, request):
     if request.command == Command.APPS_LAUNCH:
         app_id = request.app_id
-        if not app_id or any(char in app_id for char in (":", "/", "\\")):
+        if not app_id:
             raise AgentError(ErrorCode.INVALID_ARGUMENT, details={"reason": "app_id_required"})
+        if any(char in app_id for char in (":", "/", "\\")):
+            raise AgentError(ErrorCode.INVALID_ARGUMENT, details={"reason": "invalid_app_id"})
         require(session, "LaunchApp")
         installed = await list_apps(session)
         if app_id not in {app.app_id for app in installed.apps}:

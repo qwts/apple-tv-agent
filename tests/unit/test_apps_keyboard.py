@@ -239,3 +239,35 @@ def test_untrusted_app_name_remains_display_data():
     ]
     assert run(session.apps()).apps[0].name == name
     session.facade.apps.launch_app.assert_not_called()
+
+
+@pytest.mark.parametrize("listing", ["available", "unavailable", "unsupported", "unknown"])
+@pytest.mark.parametrize("launch", ["available", "unavailable", "unsupported", "unknown"])
+def test_launch_capability_requires_both_features(listing, launch):
+    session = session_for()
+    session.feature = lambda name: Capability(
+        state={"AppList": listing, "LaunchApp": launch}.get(name, "available"), reason=None
+    )
+    result = run(session.capabilities()).features[Command.APPS_LAUNCH]
+    assert (result.state == "available") == (listing == launch == "available")
+    if launch == "available" and listing != "available":
+        assert result.state == listing
+        assert result.reason == "app_list_required"
+
+
+@pytest.mark.parametrize(
+    "app_id,reason",
+    [
+        (None, "app_id_required"),
+        ("https://example.com", "invalid_app_id"),
+        ("folder/app", "invalid_app_id"),
+        ("folder\\app", "invalid_app_id"),
+    ],
+)
+def test_app_id_errors_distinguish_missing_from_invalid(app_id, reason):
+    session = session_for()
+    with pytest.raises(AgentError) as error:
+        run(session.act(Request(Command.APPS_LAUNCH, app_id=app_id)))
+    assert error.value.details["reason"] == reason
+    session.facade.apps.app_list.assert_not_called()
+    assert not session.dispatched

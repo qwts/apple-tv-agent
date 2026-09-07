@@ -43,3 +43,7 @@ When complete, record changed files, exact validation commands and results, host
 - Reference macOS 26.6.2 arm64 / Python 3.14.7 / pyatv 0.18.0: saved credentials returned 28 launchable apps. One exact installed Netflix launch completed with sent and no stderr. Visible launch effect was not independently confirmed.
 
 Intentional focused-field keyboard typing and Windows 11 hardware remain untested release gates in issues 001/010. No keyboard text was sent to the reference TV in this run.
+
+### Review follow-up
+
+Launch capability now requires both LaunchApp and AppList; missing app IDs and URL/path-shaped IDs have distinct reasons. Regression tests cover all capability-state combinations and input error reasons.

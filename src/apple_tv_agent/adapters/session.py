@@ -178,6 +178,13 @@ class OwnedSession:
 
     async def capabilities(self):
         features = {command: self.feature(feature) for command, feature in ACTION_FEATURES.items()}
+        if (
+            features[Command.APPS_LAUNCH].state == "available"
+            and features[Command.APPS_LIST].state != "available"
+        ):
+            features[Command.APPS_LAUNCH] = Capability(
+                state=features[Command.APPS_LIST].state, reason="app_list_required"
+            )
         if features[Command.KEYBOARD_TYPE].state == "available":
             focus = self._focus()
             if focus != "focused":
