@@ -15,6 +15,10 @@ class ContractService:
         self.pin_reader = pin_reader
 
     async def execute(self, request: Request) -> CommandResult:
+        if request.command == Command.DOCTOR:
+            from apple_tv_agent.diagnostics import DoctorService
+
+            return await DoctorService().execute(request)
         if (
             request.command in (Command.STATUS, Command.CAPABILITIES, Command.APPS_LIST)
             or request.command in MUTATIONS

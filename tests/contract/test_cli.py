@@ -13,7 +13,6 @@ from jsonschema import Draft202012Validator
 from pydantic import TypeAdapter, ValidationError
 
 from apple_tv_agent.cli import main, parse_request
-from apple_tv_agent.controls import MUTATIONS
 from apple_tv_agent.errors import ERRORS, AgentError, ErrorCode
 from apple_tv_agent.models import (
     PAYLOADS,
@@ -181,43 +180,6 @@ def test_noninteractive_pairing_never_constructs_service(monkeypatch, capsys):
     factory.assert_not_called()
 
 
-@pytest.mark.parametrize(
-    "command",
-    [
-        c
-        for c in Command
-        if c
-        not in {
-            *MUTATIONS,
-            Command.APPS_LIST,
-            Command.STATUS,
-            Command.CAPABILITIES,
-            Command.PAIR,
-            Command.DEVICES_FORGET,
-            Command.DISCOVER,
-            Command.DEVICES_LIST,
-            Command.DEVICES_ALIAS,
-            Command.DEVICES_DEFAULT,
-        }
-    ],
-)
-def test_pending_services_are_explicitly_unavailable(command, monkeypatch, capsys):
-    monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
-    argv = command.value.split(".")
-    extra = {
-        Command.DEVICES_ALIAS: ["--name", "living-room"],
-        Command.VOLUME_SET: ["--level", "50"],
-        Command.APPS_LAUNCH: ["--app-id", "com.example.app"],
-        Command.KEYBOARD_TYPE: ["--text-stdin"],
-    }
-    stream = io.BytesIO(b"example") if command == Command.KEYBOARD_TYPE else None
-    assert main(argv + extra.get(command, []), stdin=stream) == 4
-    result = json.loads(capsys.readouterr().out)
-    VALIDATOR.validate(result)
-    assert result["command"] == command
-    assert result["error"]["details"] == {"reason": "not_implemented"}
-
-
 @pytest.mark.parametrize("code", list(ErrorCode))
 def test_all_errors_have_consistent_json_and_exit_mapping(code, capsys):
     status, result = invoke(["status"], capsys, FakeAdapter(error=AgentError(code)))
@@ -330,11 +292,11 @@ def test_entry_points_match_from_another_directory(tmp_path):
     )
     commands = [[str(console)], [sys.executable, "-m", "apple_tv_agent"]]
     results = [
-        subprocess.run(command + ["doctor"], cwd=tmp_path, capture_output=True)
+        subprocess.run(command + ["remote", "unknown-action"], cwd=tmp_path, capture_output=True)
         for command in commands
     ]
     assert results[0].stdout == results[1].stdout
-    assert [r.returncode for r in results] == [4, 4]
+    assert [r.returncode for r in results] == [2, 2]
     assert all(r.stderr == b"" for r in results)
     VALIDATOR.validate(json.loads(results[0].stdout))
 
