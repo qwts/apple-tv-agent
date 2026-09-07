@@ -2,7 +2,7 @@
 
 An implementation blueprint for an agent skill that controls a local Apple TV from a macOS or Windows computer.
 
-**Status: transport spike in progress.** The repository contains the design, implementation issues, and an opt-in [transport probe with compatibility evidence](docs/compatibility.md). The production CLI and installable skill do not exist yet; the commands below describe the intended interface.
+**Status: CLI contract foundation implemented; device services pending.** The installable package validates requests and returns structured errors for unimplemented services. The agent skill is still pending. Follow the [package setup and CLI contract](docs/cli-contract.md) to build and test locally. The separate [transport probe](docs/compatibility.md) has been used to pair and control a real TV; the workflow below describes the intended completed product.
 
 ## Intended experience
 

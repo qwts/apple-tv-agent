@@ -1,0 +1,2259 @@
+{
+  "$defs": {
+    "ActionData": {
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "confirmed"
+          }
+        }
+      },
+      "properties": {
+        "observed_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StatusData"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "confirmed",
+            "sent",
+            "unknown"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "outcome",
+        "observed_state"
+      ],
+      "then": {
+        "properties": {
+          "observed_state": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      },
+      "title": "ActionData",
+      "type": "object"
+    },
+    "AliasData": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "not": {
+              "pattern": "[\\u0000-\\u001f\\u007f]"
+            },
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        }
+      },
+      "required": [
+        "aliases"
+      ],
+      "title": "AliasData",
+      "type": "object"
+    },
+    "App": {
+      "additionalProperties": false,
+      "properties": {
+        "app_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "App Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "app_id",
+        "name"
+      ],
+      "title": "App",
+      "type": "object"
+    },
+    "AppsData": {
+      "additionalProperties": false,
+      "properties": {
+        "apps": {
+          "items": {
+            "$ref": "#/$defs/App"
+          },
+          "title": "Apps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "apps"
+      ],
+      "title": "AppsData",
+      "type": "object"
+    },
+    "AppsLaunchSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "apps.launch",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "AppsLaunchSuccess",
+      "type": "object"
+    },
+    "AppsListSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "apps.list",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/AppsData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "AppsListSuccess",
+      "type": "object"
+    },
+    "CapabilitiesData": {
+      "additionalProperties": false,
+      "properties": {
+        "features": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Capability"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/Command"
+          },
+          "title": "Features",
+          "type": "object"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "observed_at",
+        "features"
+      ],
+      "title": "CapabilitiesData",
+      "type": "object"
+    },
+    "CapabilitiesSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "capabilities",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/CapabilitiesData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "CapabilitiesSuccess",
+      "type": "object"
+    },
+    "Capability": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "state": {
+          "enum": [
+            "available",
+            "unavailable",
+            "unsupported",
+            "unknown"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state",
+        "reason"
+      ],
+      "title": "Capability",
+      "type": "object"
+    },
+    "Check": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_tested"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "status",
+        "message"
+      ],
+      "title": "Check",
+      "type": "object"
+    },
+    "Command": {
+      "enum": [
+        "doctor",
+        "discover",
+        "devices.list",
+        "devices.alias",
+        "devices.default",
+        "devices.forget",
+        "pair",
+        "status",
+        "capabilities",
+        "remote.up",
+        "remote.down",
+        "remote.left",
+        "remote.right",
+        "remote.select",
+        "remote.menu",
+        "remote.home",
+        "remote.play",
+        "remote.pause",
+        "remote.stop",
+        "remote.next",
+        "remote.previous",
+        "power.on",
+        "power.off",
+        "volume.up",
+        "volume.down",
+        "volume.set",
+        "apps.list",
+        "apps.launch",
+        "keyboard.type"
+      ],
+      "title": "Command",
+      "type": "string"
+    },
+    "DefaultData": {
+      "additionalProperties": false,
+      "properties": {
+        "default_device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Default Device Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "default_device_id"
+      ],
+      "title": "DefaultData",
+      "type": "object"
+    },
+    "DeviceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "not": {
+              "pattern": "[\\u0000-\\u001f\\u007f]"
+            },
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "identifiers": {
+          "additionalProperties": {
+            "maxLength": 256,
+            "minLength": 1,
+            "not": {
+              "pattern": "[\\u0000-\\u001f\\u007f]"
+            },
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/ProtocolName"
+          },
+          "title": "Identifiers",
+          "type": "object"
+        },
+        "last_host": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Host"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "paired_protocols": {
+          "items": {
+            "$ref": "#/$defs/ProtocolName"
+          },
+          "title": "Paired Protocols",
+          "type": "array"
+        }
+      },
+      "required": [
+        "device_id",
+        "name",
+        "aliases",
+        "identifiers",
+        "last_host",
+        "paired_protocols"
+      ],
+      "title": "DeviceRecord",
+      "type": "object"
+    },
+    "DevicesAliasSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "devices.alias",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/AliasData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "DevicesAliasSuccess",
+      "type": "object"
+    },
+    "DevicesData": {
+      "additionalProperties": false,
+      "properties": {
+        "default_device_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "not": {
+                "pattern": "[\\u0000-\\u001f\\u007f]"
+              },
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Default Device Id"
+        },
+        "devices": {
+          "items": {
+            "$ref": "#/$defs/DeviceRecord"
+          },
+          "title": "Devices",
+          "type": "array"
+        }
+      },
+      "required": [
+        "devices",
+        "default_device_id"
+      ],
+      "title": "DevicesData",
+      "type": "object"
+    },
+    "DevicesDefaultSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "devices.default",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/DefaultData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "DevicesDefaultSuccess",
+      "type": "object"
+    },
+    "DevicesForgetSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "devices.forget",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ForgetData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "DevicesForgetSuccess",
+      "type": "object"
+    },
+    "DevicesListSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "devices.list",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/DevicesData"
+        },
+        "device_id": {
+          "const": null,
+          "title": "Device Id",
+          "type": "null"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "DevicesListSuccess",
+      "type": "object"
+    },
+    "DiscoverSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "discover",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/DiscoveryData"
+        },
+        "device_id": {
+          "const": null,
+          "title": "Device Id",
+          "type": "null"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "DiscoverSuccess",
+      "type": "object"
+    },
+    "DiscoveredDevice": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "host": {
+          "title": "Host",
+          "type": "string"
+        },
+        "identifiers": {
+          "additionalProperties": {
+            "maxLength": 256,
+            "minLength": 1,
+            "not": {
+              "pattern": "[\\u0000-\\u001f\\u007f]"
+            },
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/ProtocolName"
+          },
+          "title": "Identifiers",
+          "type": "object"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "pairing": {
+          "additionalProperties": {
+            "enum": [
+              "mandatory",
+              "optional",
+              "not_needed",
+              "disabled",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/ProtocolName"
+          },
+          "title": "Pairing",
+          "type": "object"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "name",
+        "host",
+        "identifiers",
+        "pairing"
+      ],
+      "title": "DiscoveredDevice",
+      "type": "object"
+    },
+    "DiscoveryData": {
+      "additionalProperties": false,
+      "properties": {
+        "devices": {
+          "items": {
+            "$ref": "#/$defs/DiscoveredDevice"
+          },
+          "title": "Devices",
+          "type": "array"
+        }
+      },
+      "required": [
+        "devices"
+      ],
+      "title": "DiscoveryData",
+      "type": "object"
+    },
+    "DoctorData": {
+      "additionalProperties": false,
+      "properties": {
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/Check"
+          },
+          "title": "Checks",
+          "type": "array"
+        },
+        "platform": {
+          "title": "Platform",
+          "type": "string"
+        },
+        "python": {
+          "title": "Python",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "python",
+        "platform",
+        "checks"
+      ],
+      "title": "DoctorData",
+      "type": "object"
+    },
+    "DoctorSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "doctor",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/DoctorData"
+        },
+        "device_id": {
+          "const": null,
+          "title": "Device Id",
+          "type": "null"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "DoctorSuccess",
+      "type": "object"
+    },
+    "ErrorCode": {
+      "enum": [
+        "INVALID_ARGUMENT",
+        "DEVICE_NOT_FOUND",
+        "DEVICE_AMBIGUOUS",
+        "IDENTITY_MISMATCH",
+        "PAIRING_REQUIRED",
+        "INTERACTIVE_REQUIRED",
+        "AUTH_FAILED",
+        "CREDENTIAL_STORE_UNAVAILABLE",
+        "UNSUPPORTED_FEATURE",
+        "FEATURE_UNAVAILABLE",
+        "TIMEOUT",
+        "NETWORK_ERROR",
+        "DEVICE_BUSY",
+        "CONFIG_ERROR",
+        "INTERNAL_ERROR"
+      ],
+      "title": "ErrorCode",
+      "type": "string"
+    },
+    "ErrorData": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "details": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Details",
+          "type": "object"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable",
+        "details"
+      ],
+      "title": "ErrorData",
+      "type": "object"
+    },
+    "Failure": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Command"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data": {
+          "title": "Data",
+          "type": "null"
+        },
+        "device_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "not": {
+                "pattern": "[\\u0000-\\u001f\\u007f]"
+              },
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Device Id"
+        },
+        "error": {
+          "$ref": "#/$defs/ErrorData"
+        },
+        "ok": {
+          "const": false,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "Failure",
+      "type": "object"
+    },
+    "ForgetData": {
+      "additionalProperties": false,
+      "properties": {
+        "default_cleared": {
+          "title": "Default Cleared",
+          "type": "boolean"
+        },
+        "local_credentials_removed": {
+          "title": "Local Credentials Removed",
+          "type": "boolean"
+        },
+        "registry_removed": {
+          "title": "Registry Removed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "local_credentials_removed",
+        "registry_removed",
+        "default_cleared"
+      ],
+      "title": "ForgetData",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "KeyboardTypeSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "keyboard.type",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "KeyboardTypeSuccess",
+      "type": "object"
+    },
+    "PairData": {
+      "additionalProperties": false,
+      "properties": {
+        "protocols": {
+          "additionalProperties": {
+            "enum": [
+              "paired",
+              "not_needed",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/ProtocolName"
+          },
+          "title": "Protocols",
+          "type": "object"
+        }
+      },
+      "required": [
+        "protocols"
+      ],
+      "title": "PairData",
+      "type": "object"
+    },
+    "PairSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "pair",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/PairData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "PairSuccess",
+      "type": "object"
+    },
+    "PowerOffSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "power.off",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "PowerOffSuccess",
+      "type": "object"
+    },
+    "PowerOnSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "power.on",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "PowerOnSuccess",
+      "type": "object"
+    },
+    "ProtocolName": {
+      "enum": [
+        "airplay",
+        "companion",
+        "mrp",
+        "raop",
+        "dmap"
+      ],
+      "title": "ProtocolName",
+      "type": "string"
+    },
+    "RemoteDownSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.down",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteDownSuccess",
+      "type": "object"
+    },
+    "RemoteHomeSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.home",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteHomeSuccess",
+      "type": "object"
+    },
+    "RemoteLeftSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.left",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteLeftSuccess",
+      "type": "object"
+    },
+    "RemoteMenuSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.menu",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteMenuSuccess",
+      "type": "object"
+    },
+    "RemoteNextSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.next",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteNextSuccess",
+      "type": "object"
+    },
+    "RemotePauseSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.pause",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemotePauseSuccess",
+      "type": "object"
+    },
+    "RemotePlaySuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.play",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemotePlaySuccess",
+      "type": "object"
+    },
+    "RemotePreviousSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.previous",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemotePreviousSuccess",
+      "type": "object"
+    },
+    "RemoteRightSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.right",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteRightSuccess",
+      "type": "object"
+    },
+    "RemoteSelectSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.select",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteSelectSuccess",
+      "type": "object"
+    },
+    "RemoteStopSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.stop",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteStopSuccess",
+      "type": "object"
+    },
+    "RemoteUpSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "remote.up",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "RemoteUpSuccess",
+      "type": "object"
+    },
+    "StatusData": {
+      "additionalProperties": false,
+      "properties": {
+        "album": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Album"
+        },
+        "app_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "not": {
+                "pattern": "[\\u0000-\\u001f\\u007f]"
+              },
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "App Id"
+        },
+        "artist": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Artist"
+        },
+        "duration": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Duration"
+        },
+        "keyboard_focus": {
+          "enum": [
+            "focused",
+            "unfocused",
+            "unknown"
+          ],
+          "title": "Keyboard Focus",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "playback_state": {
+          "anyOf": [
+            {
+              "enum": [
+                "playing",
+                "paused",
+                "stopped",
+                "loading",
+                "seeking",
+                "idle"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Playback State"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Position"
+        },
+        "power": {
+          "anyOf": [
+            {
+              "enum": [
+                "on",
+                "off"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Power"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "unavailable_fields": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Unavailable Fields",
+          "type": "object"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Volume"
+        }
+      },
+      "required": [
+        "observed_at",
+        "playback_state",
+        "power",
+        "title",
+        "artist",
+        "album",
+        "app_id",
+        "position",
+        "duration",
+        "volume",
+        "keyboard_focus",
+        "unavailable_fields"
+      ],
+      "title": "StatusData",
+      "type": "object"
+    },
+    "StatusSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "status",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/StatusData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "StatusSuccess",
+      "type": "object"
+    },
+    "VolumeDownSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "volume.down",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "VolumeDownSuccess",
+      "type": "object"
+    },
+    "VolumeSetSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "volume.set",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "VolumeSetSuccess",
+      "type": "object"
+    },
+    "VolumeUpSuccess": {
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "const": "volume.up",
+          "title": "Command",
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/$defs/ActionData"
+        },
+        "device_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "not": {
+            "pattern": "[\\u0000-\\u001f\\u007f]"
+          },
+          "pattern": "\\S",
+          "title": "Device Id",
+          "type": "string"
+        },
+        "error": {
+          "title": "Error",
+          "type": "null"
+        },
+        "ok": {
+          "const": true,
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "device_id",
+        "ok",
+        "command",
+        "data",
+        "error"
+      ],
+      "title": "VolumeUpSuccess",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/qwts/apple-tv-agent/blob/main/schemas/response-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/DoctorSuccess"
+    },
+    {
+      "$ref": "#/$defs/DiscoverSuccess"
+    },
+    {
+      "$ref": "#/$defs/DevicesListSuccess"
+    },
+    {
+      "$ref": "#/$defs/DevicesAliasSuccess"
+    },
+    {
+      "$ref": "#/$defs/DevicesDefaultSuccess"
+    },
+    {
+      "$ref": "#/$defs/DevicesForgetSuccess"
+    },
+    {
+      "$ref": "#/$defs/PairSuccess"
+    },
+    {
+      "$ref": "#/$defs/StatusSuccess"
+    },
+    {
+      "$ref": "#/$defs/CapabilitiesSuccess"
+    },
+    {
+      "$ref": "#/$defs/AppsListSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteUpSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteDownSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteLeftSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteRightSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteSelectSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteMenuSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteHomeSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemotePlaySuccess"
+    },
+    {
+      "$ref": "#/$defs/RemotePauseSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteStopSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemoteNextSuccess"
+    },
+    {
+      "$ref": "#/$defs/RemotePreviousSuccess"
+    },
+    {
+      "$ref": "#/$defs/PowerOnSuccess"
+    },
+    {
+      "$ref": "#/$defs/PowerOffSuccess"
+    },
+    {
+      "$ref": "#/$defs/VolumeUpSuccess"
+    },
+    {
+      "$ref": "#/$defs/VolumeDownSuccess"
+    },
+    {
+      "$ref": "#/$defs/VolumeSetSuccess"
+    },
+    {
+      "$ref": "#/$defs/AppsLaunchSuccess"
+    },
+    {
+      "$ref": "#/$defs/KeyboardTypeSuccess"
+    },
+    {
+      "$ref": "#/$defs/Failure"
+    }
+  ]
+}

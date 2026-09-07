@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "apple-tv-agent"
+version = "0.1.0a1"
+description = "Local Apple TV agent CLI (contract foundation; device services pending)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pyatv==0.18.0",
+  "keyring==25.7.0",
+  "platformdirs==4.11.7",
+  "pydantic==2.13.5",
+]
+
+[project.scripts]
+apple-tv-agent = "apple_tv_agent.cli:main"
+
+[dependency-groups]
+dev = [
+  "build==1.6.0",
+  "hatchling==1.32.0",
+  "jsonschema>=4.26.0",
+  "pytest==9.1.1",
+  "ruff==0.16.6",
+  "uv==0.12.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/apple_tv_agent"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "schemas", "pyproject.toml", "README.md", "docs/cli-contract.md"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"schemas/response-v1.json" = "apple_tv_agent/response-v1.json"

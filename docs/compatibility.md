@@ -132,3 +132,9 @@ Probe result: Play `sent`; playback readback `paused`.
 | Windows Server 2025 | AMD64 | 3.14.7 | Pass |
 
 Windows selected `keyring.backends.Windows.WinVaultKeyring`; macOS selected `keyring.backends.macOS.Keyring`. CI does not perform native-vault writes or LAN/hardware operations. Windows Server installation and fake-backed test success do not establish Windows 11 interactive pairing or credential persistence.
+
+## Package foundation validation (issue 002)
+
+[Run 34088665314](https://github.com/qwts/apple-tv-agent/actions/runs/34088665314), commit `fd0ea01`, passed on macOS and Windows runners with Python 3.12 and 3.14. Each job synchronized the universal dependency lock, checked native backend selection, passed Ruff and all **143 tests**, built a source distribution and wheel, then installed the wheel with hashed runtime dependencies in a fresh temporary virtual environment. Both CLI entry points and the bundled schema passed checks from a path containing spaces outside the checkout.
+
+These package checks require no TV or persisted credentials. They establish installation and contract behavior; the Windows 11 hardware and native-vault persistence gates in issue 001 remain open.
