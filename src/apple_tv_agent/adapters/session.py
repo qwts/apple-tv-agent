@@ -6,6 +6,7 @@ from functools import partial
 
 from pydantic import TypeAdapter, ValidationError
 
+from apple_tv_agent import apps_keyboard
 from apple_tv_agent.controls import CORE_CONTROLS, dispatch
 from apple_tv_agent.discovery import resolve_identity
 from apple_tv_agent.errors import AgentError, ErrorCode
@@ -60,7 +61,15 @@ class OwnedSession:
 
     async def act(self, request):
         try:
+            if request.command in apps_keyboard.APP_KEYBOARD_MUTATIONS:
+                return await apps_keyboard.dispatch(self, request)
             return await dispatch(self, request)
+        except Exception as error:
+            raise public_error(error) from None
+
+    async def apps(self):
+        try:
+            return await apps_keyboard.list_apps(self)
         except Exception as error:
             raise public_error(error) from None
 
@@ -169,6 +178,13 @@ class OwnedSession:
 
     async def capabilities(self):
         features = {command: self.feature(feature) for command, feature in ACTION_FEATURES.items()}
+        if (
+            features[Command.APPS_LAUNCH].state == "available"
+            and features[Command.APPS_LIST].state != "available"
+        ):
+            features[Command.APPS_LAUNCH] = Capability(
+                state=features[Command.APPS_LIST].state, reason="app_list_required"
+            )
         if features[Command.KEYBOARD_TYPE].state == "available":
             focus = self._focus()
             if focus != "focused":

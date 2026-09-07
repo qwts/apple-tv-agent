@@ -33,7 +33,7 @@ dev = [
 packages = ["src/apple_tv_agent"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "schemas", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md", "docs/controls.md"]
+include = ["src", "schemas", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md", "docs/controls.md", "docs/apps-keyboard.md"]
 
 [tool.ruff]
 target-version = "py312"
@@ -48,3 +48,4 @@ select = ["E4", "E7", "E9", "F", "I"]
 "docs/pairing.md" = "apple_tv_agent/docs/pairing.md"
 "docs/sessions.md" = "apple_tv_agent/docs/sessions.md"
 "docs/controls.md" = "apple_tv_agent/docs/controls.md"
+"docs/apps-keyboard.md" = "apple_tv_agent/docs/apps-keyboard.md"
