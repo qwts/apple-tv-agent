@@ -30,6 +30,8 @@ def check_schema(schema):
 
 
 def main():
+    from check_skill import validate as validate_skill
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--requirements", type=Path, required=True)
     args = parser.parse_args()
@@ -99,6 +101,33 @@ def main():
         ):
             if resources[guide] != (root / guide).read_text(encoding="utf-8"):
                 raise RuntimeError("Bundled recovery guide differs from the source.")
+        exported = base / "exported skills" / "apple-tv-control"
+        subprocess.run(
+            [
+                str(python),
+                "-c",
+                "import shutil, sys; from importlib.resources import files; "
+                "shutil.copytree(str(files('apple_tv_agent').joinpath('skills/apple-tv-control')), sys.argv[1])",
+                str(exported),
+            ],
+            check=True,
+            cwd=base,
+            env=env,
+        )
+        validate_skill(exported)
+        source_skill = root / "skills/apple-tv-control"
+        expected = {
+            path.relative_to(source_skill): path.read_bytes()
+            for path in source_skill.rglob("*")
+            if path.is_file()
+        }
+        actual = {
+            path.relative_to(exported): path.read_bytes()
+            for path in exported.rglob("*")
+            if path.is_file()
+        }
+        if actual != expected:
+            raise RuntimeError("Exported wheel skill differs from source")
     print(
         "Clean wheel installation and both entry points passed (working directory contains spaces)."
     )

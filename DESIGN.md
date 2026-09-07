@@ -1,6 +1,6 @@
 # Apple TV Agent design
 
-Status: proposed, implementation pending. Research checked 2026-09-06. Decisions below are project requirements; hardware compatibility remains to be measured.
+Status: CLI implemented; portable skill packaged in issue 009. Baseline research checked 2026-09-06; implementation evidence is recorded in the issue backlog. Decisions below remain project requirements; outstanding hardware compatibility gates are explicit.
 
 ## Outcome and scope
 
@@ -25,7 +25,7 @@ Use a Python package with a console entry point `apple-tv-agent` and module entr
 
 The CLI parses and validates input, emits the public JSON contract, and maps exit codes. Services select devices and enforce capabilities and action rules. Only the adapter imports pyatv protocol APIs. Inject adapter and storage interfaces so unit tests never touch the LAN. One process owns a bounded connection for one command and closes it in finally/cancellation paths. Do not parse human `atvremote` output or implement Apple's protocols from scratch.
 
-Planned layout (created by implementation issues, not empty scaffolding now):
+Implementation layout:
 
 ```text
 pyproject.toml
@@ -74,7 +74,7 @@ All noninteractive commands emit exactly one UTF-8 JSON object to stdout, includ
 | --- | --- |
 | `doctor` | Local runtime, dependency and vault checks; LAN checks only with `--network` |
 | `discover` | Optional `--host ADDRESS`; candidate IDs, names, addresses, pairing requirements |
-| `devices list` | Registered devices, aliases/default, credential presence without values |
+| `devices list` | Registered devices, aliases/default, pairing markers without credential access |
 | `devices alias` | `--device ID --name ALIAS` |
 | `devices default` | `--device ID` |
 | `devices forget` | `--device ID` |
