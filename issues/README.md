@@ -11,8 +11,8 @@ The implementation plans are maintained here and tracked as [GitHub issues](http
 | [005: Implement bounded sessions, capabilities and status](005-session-status.md) | P0 | 004 | Complete |
 | [006: Implement navigation, playback, power and volume](006-core-controls.md) | P0 | 005 | Complete |
 | [007: Implement installed-app launch and focused text input](007-apps-keyboard.md) | P1 | 006 | Complete |
-| [008: Add actionable local diagnostics and recovery guidance](008-diagnostics.md) | P1 | 005 | In review |
-| [009: Author and package the portable Apple TV control skill](009-agent-skill.md) | P0 | 006, 007, 008 | Open |
+| [008: Add actionable local diagnostics and recovery guidance](008-diagnostics.md) | P1 | 005 | Complete |
+| [009: Author and package the portable Apple TV control skill](009-agent-skill.md) | P0 | 006, 007, 008 | In review |
 | [010: Complete cross-platform CI and real-device release validation](010-validation-release.md) | P0 | 009 | Open |
 
 Suggested sequence: 001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010. Issue 008 can start after 005 independently of control implementation.

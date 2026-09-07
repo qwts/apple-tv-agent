@@ -1,43 +1,50 @@
 # Apple TV Agent
 
-An implementation blueprint for an agent skill that controls a local Apple TV from a macOS or Windows computer.
+Control a local Apple TV from an agent running on your Mac or Windows computer. The Python CLI discovers and pairs devices, reads status, sends remote/playback/power/volume commands, launches installed apps, and appends text to focused inputs. The portable [apple-tv-control skill](skills/apple-tv-control/SKILL.md) teaches an agent how to use those commands and interpret their results.
 
-**Status: discovery, device registry and native-vault pairing, status and capabilities implemented; core navigation/playback/power/volume implemented; installed-app launch, focused keyboard input and local diagnostics implemented; agent skill pending.** Follow the [package setup](docs/cli-contract.md), [registry guide](docs/registry.md) and [interactive pairing guide](docs/pairing.md), and [status/capabilities guide](docs/sessions.md) and [controls guide](docs/controls.md), plus [apps and keyboard](docs/apps-keyboard.md). Use [doctor and troubleshooting](docs/troubleshooting.md) for setup checks. Pairing runs in a local terminal with hidden PIN input; verified credentials remain in the native vault. Hardware support evidence and remaining Windows gates are tracked in [compatibility](docs/compatibility.md).
+**Development preview:** macOS hardware has been exercised; macOS/Windows CI checks installation and simulated behavior on Python 3.12/3.14. Windows 11 TV/native-vault hardware validation remains open. See [compatibility evidence](docs/compatibility.md). There is no published package-index release yet.
 
-## Intended experience
+## Install
 
-Ask an agent to “pause the living room Apple TV,” “open an installed app,” “go home,” or “tell me what is playing.” The agent runs a local Python CLI, which communicates with the selected Apple TV over the LAN. Initial pairing requires a person to read a PIN from the TV and enter it in a local terminal.
+Clone a reviewed revision of this repository, then follow the [macOS or PowerShell setup instructions](skills/apple-tv-control/references/setup.md). They install the locked environment and use absolute executable paths, so you do not need shell activation or a particular working directory.
 
-The first release targets Apple TV HD and Apple TV 4K with macOS and native Windows. Exact supported OS, Python, and tvOS versions must be recorded after testing. The computer needs LAN access to the TV, a local command execution tool, and access to the paired user's credential store. Each computer pairs independently. No Apple ID password or developer account is part of the proposed workflow.
+Install the CLI and skill separately:
 
-## Planned workflow
+1. Install the Python package from the checkout using its committed uv.lock.
+2. Copy `skills/apple-tv-control` with all its references into your client's skill directory. For current Codex, the documented user location is `~/.agents/skills`; [copy instructions](skills/apple-tv-control/references/setup.md) refuse to overwrite an existing skill. No client settings are changed automatically.
+3. Give your agent the absolute path to the installed `apple-tv-agent` executable. The agent must be able to execute locally on the TV's LAN; a cloud-only session cannot reach it automatically.
 
-After the package and skill have been implemented and installed:
+[Official Codex skill documentation](https://learn.chatgpt.com/docs/build-skills)
+
+## Pair and use
+
+Using your installed executable (shown as `apple-tv-agent` below):
 
 ```text
 apple-tv-agent doctor
 apple-tv-agent discover
-apple-tv-agent pair --device DEVICE_ID
-apple-tv-agent devices alias --device DEVICE_ID --name living-room
-apple-tv-agent status --device living-room
-apple-tv-agent remote pause --device living-room
-apple-tv-agent apps list --device living-room
-apple-tv-agent apps launch --device living-room --app-id APP_ID
+apple-tv-agent pair --device CANDIDATE_ID
+apple-tv-agent devices list
+apple-tv-agent capabilities --device REGISTERED_UUID
+apple-tv-agent status --device REGISTERED_UUID
+apple-tv-agent remote pause --device REGISTERED_UUID
+apple-tv-agent apps list --device REGISTERED_UUID
+apple-tv-agent apps launch --device REGISTERED_UUID --app-id EXACT_INSTALLED_APP_ID
 ```
 
-Pairing is interactive; other commands return JSON. The skill will explain how to invoke the CLI from both macOS shells and Windows PowerShell without assuming shell activation or a particular working directory.
+Pairing runs in your own interactive terminal with hidden PIN entry. Verified credentials stay in macOS Keychain or Windows Credential Manager; each computer pairs independently. No Apple ID password or developer account is required. See [pairing and recovery](docs/pairing.md).
 
-## Implementation documents
+Once paired, ask the agent “pause the living room Apple TV,” “open YouTube,” or “tell me what is playing.” Explicit UUID/alias selection takes precedence over a saved default or the sole registered TV. Ambiguous devices require a choice before control.
 
-- [DESIGN.md](DESIGN.md): scope, architecture, CLI contract, pairing, storage, failure handling, and validation.
-- [Issue backlog](issues/README.md): ordered work with dependencies, agent implementation plans, and acceptance criteria.
+Ordinary commands emit JSON. A control can be `confirmed` by matching observed state or merely `sent`; a connection failure after possible dispatch reports `unknown`. Actions are never retried automatically. Missing metadata remains null. Read [command semantics](docs/controls.md), [apps and keyboard](docs/apps-keyboard.md), and [diagnostics](docs/troubleshooting.md) for limits and recovery.
 
-Start with [001: validate the transport](issues/001-transport-spike.md). An implementing agent should read the design and its selected issue, complete dependencies, implement and test the issue, and update its status with evidence. Hardware-dependent work stays explicitly unverified until exercised on real hardware.
+## Limits and development
 
-## Expected limitations
+Capabilities depend on the TV, active app and audio/display setup. The baseline CLI does not expose screenshots, screen reading, Siri, purchases, arbitrary deep links or internet remote access. An optional LG provider has [HDMI screenshot feasibility evidence](docs/lg-screen-capture-spike.md) and a [follow-up implementation plan](issues/011-lg-screen-observation.md); it is not yet a packaged capability.
 
-Commands depend on features exposed by the device and active app. Power and volume may also depend on the connected display or audio setup. The first release does not provide screen viewing, Siri, arbitrary visual navigation, content search inside streaming services, purchases, or remote access over the internet.
+- [DESIGN.md](DESIGN.md): architecture, contracts and release boundaries.
+- [Issue backlog](issues/README.md): implementation plans and validation evidence.
+- [CLI contract and development checks](docs/cli-contract.md): locked setup, tests and package builds.
+- [Skill validation](docs/skill-validation.md): portable packaging checks and fake-CLI walkthroughs.
 
-## Technical basis
-
-The proposed transport is [pyatv](https://pyatv.dev/documentation/), accessed through its Python API behind a stable adapter. Runtime capability checks follow its [supported-features guidance](https://pyatv.dev/documentation/supported_features/). This project is independent of Apple and pyatv.
+The project uses pinned [pyatv](https://pyatv.dev/documentation/) APIs behind a stable CLI adapter and is independent of Apple and pyatv. Build artifacts remain local until publication is explicitly requested.
