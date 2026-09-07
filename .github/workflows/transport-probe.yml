@@ -1,4 +1,4 @@
-name: Transport probe
+name: Package and transport
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ jobs:
   probe:
     name: ${{ matrix.os }} / Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -25,11 +25,23 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: ${{ matrix.python }}
-      - name: Install probe dependencies
-        run: python -m pip install -r tools/requirements-spike.txt
-      - name: Check dependency consistency
-        run: python -m pip check
-      - name: Inspect runtime and native backend selection
-        run: python tools/transport_probe.py environment
-      - name: Test without a TV or vault secrets
-        run: python -m pytest -q
+      - name: Install lock tooling
+        run: python -m pip install uv==0.12.10
+      - name: Install locked development environment
+        run: uv sync --locked --python ${{ matrix.python }}
+      - name: Check dependencies and native backend selection
+        run: |
+          uv pip check
+          uv run --locked --no-sync python tools/transport_probe.py environment
+      - name: Lint and formatting
+        run: |
+          uv run --locked --no-sync ruff check src tests/contract tools/generate_schema.py tools/check_wheel.py
+          uv run --locked --no-sync ruff format --check src tests/contract tools/generate_schema.py tools/check_wheel.py
+      - name: Contract and probe tests without hardware
+        run: uv run --locked --no-sync python -m pytest -q
+      - name: Build source distribution and wheel with locked build dependencies
+        run: uv run --locked --no-sync python -m build --no-isolation
+      - name: Export hashed runtime dependencies
+        run: uv export --locked --no-dev --no-emit-project --output-file runtime-requirements.txt
+      - name: Verify clean wheel installation and both entry points
+        run: uv run --locked --no-sync python tools/check_wheel.py --requirements runtime-requirements.txt

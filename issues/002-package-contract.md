@@ -1,7 +1,7 @@
 # 002: Create the Python package and JSON CLI contract
 
 GitHub: https://github.com/qwts/apple-tv-agent/issues/2
-Status: open
+Status: in progress
 Priority: P0
 Depends on: [001](001-transport-spike.md)
 
@@ -32,3 +32,13 @@ Use contract tests for valid/invalid commands, malformed numeric values, Unicode
 ## Completion evidence
 
 When complete, record changed files, exact validation commands and results, host/device versions where relevant, and remaining limitations here. Update status only after acceptance criteria are satisfied. Never record secrets or raw sensitive logs.
+
+### Implementation evidence
+
+- Added the Python package, both entry points, typed payloads for all 29 commands, JSON schema, error catalog, validated requests, dependency protocols and an explicit unavailable default service.
+- Added a deterministic test-only fake adapter; invalid arguments and stdin fail before service construction.
+- `uv.lock` records cross-platform runtime/development resolution; wheel build uses locked build dependencies and includes the response schema.
+- Fresh local macOS wheel installation passed from a temporary directory containing spaces. CI now repeats fresh wheel installation and both-entry-point checks on macOS and Windows with Python 3.12/3.14.
+- Issue 001 remains open for Windows 11 hardware and native-vault persistence. This issue implements the development contract without waiving those release gates.
+
+Local validation: **143 tests passed** (contract and existing transport suites); Ruff checks/formatting, lock consistency, dependency checks, source/wheel build, and fresh wheel entry-point smoke tests passed on macOS arm64 / Python 3.14.7. Cross-platform CI pending.

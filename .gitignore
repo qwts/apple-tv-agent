@@ -16,3 +16,5 @@ Thumbs.db
 .pyatv.conf
 credentials*.json
 .local/
+
+runtime-requirements.txt
