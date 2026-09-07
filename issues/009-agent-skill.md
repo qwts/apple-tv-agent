@@ -1,5 +1,6 @@
 # 009: Author and package the portable Apple TV control skill
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/9
 Status: open
 Priority: P0
 Depends on: [006](006-core-controls.md), [007](007-apps-keyboard.md), [008](008-diagnostics.md)

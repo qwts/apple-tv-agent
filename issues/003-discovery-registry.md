@@ -1,5 +1,6 @@
 # 003: Implement discovery, durable identity and device selection
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/3
 Status: open
 Priority: P0
 Depends on: [002](002-package-contract.md)
@@ -26,7 +27,7 @@ Read [DESIGN.md](../DESIGN.md) before implementation. Its contracts and release 
 
 ## Validation
 
-Test zero/one/many devices, alias collisions, explicit/default selection, mixed protocol identifiers, IPv4/IPv6, corrupt schema, concurrent writers and changed identities with fake scans.
+Test zero/one/many devices, alias collisions, explicit/default selection, mixed protocol identifiers, IPv4 and explicit IPv6 rejection, corrupt schema, concurrent writers and changed identities with fake scans.
 
 ## Completion evidence
 

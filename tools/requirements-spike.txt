@@ -1,0 +1,4 @@
+# Selected from the first macOS arm64 installation; full lock is issue 002.
+pyatv==0.18.0
+keyring==25.7.0
+pytest==9.1.1

@@ -1,5 +1,6 @@
 # 010: Complete cross-platform CI and real-device release validation
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/10
 Status: open
 Priority: P0
 Depends on: [009](009-agent-skill.md)

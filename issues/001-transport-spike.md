@@ -1,6 +1,7 @@
 # 001: Validate pyatv and cross-platform feasibility
 
-Status: open
+GitHub: https://github.com/qwts/apple-tv-agent/issues/1
+Status: in progress
 Priority: P0
 Depends on: None
 
@@ -31,3 +32,24 @@ Run fresh virtual-environment installs on both OSes, a disposable native-vault r
 ## Completion evidence
 
 When complete, record changed files, exact validation commands and results, host/device versions where relevant, and remaining limitations here. Update status only after acceptance criteria are satisfied. Never record secrets or raw sensitive logs.
+
+### Current evidence (2026-09-07 UTC)
+
+- Added [transport probe](../tools/transport_probe.py), pinned direct spike dependencies and [compatibility report](../docs/compatibility.md) with verified API mapping and both host OS runbooks.
+- macOS 26.6.2 arm64 / Python 3.14.7: fresh dependency install passed; `pip check` passed; `python -m pytest -q`: **17 passed**.
+- Native Keychain random-secret write/read/delete passed outside the execution sandbox; cleanup verified.
+- Initial five-second LAN discovery returned zero candidates. After the user reported Little Snitch approval, a ten-second repeat found nine AirPlay devices, including two candidates offering AirPlay/Companion PIN pairing. Targeted discovery of the user-selected Apple TV 4K (second generation), tvOS 26.2, passed. AirPlay and Companion pairing passed; status/capabilities/focus read passed; pause was sent once and the user reported the TV paused afterwards. Added an explicit Play probe with capability checks and readback at the user's request.
+- Corrected DESIGN.md and issue 003 to reject IPv6 because the selected transport's targeted scan accepts IPv4 only.
+- Remaining gates: Windows host, locked-vault behavior and physical action semantics.
+
+Issue remains in progress; the automated probe checks do not satisfy the hardware or cross-platform acceptance criteria.
+
+- Resume follow-up: local Terminal re-pairing succeeded after a user-requested retry; user confirmed Play worked. No automatic mutation retry.
+
+- Hosted CI: [run 34085123063](https://github.com/qwts/apple-tv-agent/actions/runs/34085123063) passed installation, dependency consistency, native backend selection and all 17 tests on macOS 26.6.2 arm64 and Windows Server 2025 AMD64, each with Python 3.12.10 and 3.14.7. Windows 11 hardware and native-vault write/read/delete remain unverified.
+
+- PR review fix: track attempted playback dispatch per invocation. Errors before
+  dispatch report `not_sent`; errors after dispatch starts report `unknown`.
+  Regression coverage exercises Play/Pause through the CLI across discovery,
+  pairing, connection, capability, dispatch, readback and cleanup failures. Local
+  validation: `python -m pytest -q` — **30 passed**.

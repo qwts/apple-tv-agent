@@ -1,10 +1,10 @@
 # Implementation issues
 
-These Markdown files are the local issue tracker; no hosted issues or remote repository are required. All issues start open. P0 denotes a foundation or release gate; P1 work is also included in the planned release. Dependencies determine execution order, not priority alone.
+The implementation plans are maintained here and tracked as [GitHub issues](https://github.com/qwts/apple-tv-agent/issues). Keep local status/evidence and the corresponding hosted issue synchronized. Issue status and evidence are maintained in each file. P0 denotes a foundation or release gate; P1 work is also included in the planned release. Dependencies determine execution order, not priority alone.
 
 | Issue | Priority | Depends on | Status |
 | --- | --- | --- | --- |
-| [001: Validate pyatv and cross-platform feasibility](001-transport-spike.md) | P0 | — | Open |
+| [001: Validate pyatv and cross-platform feasibility](001-transport-spike.md) | P0 | — | In progress |
 | [002: Create the Python package and JSON CLI contract](002-package-contract.md) | P0 | 001 | Open |
 | [003: Implement discovery, durable identity and device selection](003-discovery-registry.md) | P0 | 002 | Open |
 | [004: Implement native credentials and interactive pairing](004-credentials-pairing.md) | P0 | 003 | Open |
@@ -22,3 +22,16 @@ For each issue, follow its implementation plan, validate acceptance criteria, an
 Agent handoff example:
 
 > Implement issue 003 in issues/003-discovery-registry.md. Read DESIGN.md and completed dependency evidence first. Implement and validate all acceptance criteria, update documentation and issue status, and report any unmet criteria with the concrete blocker.
+
+## GitHub tracking
+
+- Issue 001: https://github.com/qwts/apple-tv-agent/issues/1
+- Issue 002: https://github.com/qwts/apple-tv-agent/issues/2
+- Issue 003: https://github.com/qwts/apple-tv-agent/issues/3
+- Issue 004: https://github.com/qwts/apple-tv-agent/issues/4
+- Issue 005: https://github.com/qwts/apple-tv-agent/issues/5
+- Issue 006: https://github.com/qwts/apple-tv-agent/issues/6
+- Issue 007: https://github.com/qwts/apple-tv-agent/issues/7
+- Issue 008: https://github.com/qwts/apple-tv-agent/issues/8
+- Issue 009: https://github.com/qwts/apple-tv-agent/issues/9
+- Issue 010: https://github.com/qwts/apple-tv-agent/issues/10

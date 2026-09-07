@@ -1,5 +1,6 @@
 # 005: Implement bounded sessions, capabilities and status
 
+GitHub: https://github.com/qwts/apple-tv-agent/issues/5
 Status: open
 Priority: P0
 Depends on: [004](004-credentials-pairing.md)
