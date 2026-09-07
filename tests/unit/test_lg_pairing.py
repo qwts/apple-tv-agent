@@ -308,3 +308,35 @@ def test_socket_uses_pin_and_rejects_redirect_trace(monkeypatch):
     assert captured["trust_env"] is False
     assert captured["closed"] and captured["session_closed"]
     assert captured["max_msg_size"] == 64 * 1024
+
+
+@pytest.mark.parametrize(
+    "raw,reason",
+    [
+        (b"{broken", "invalid_lg_registry"),
+        (b'{"schema_version":1,"devices":[],"devices":[]}', "invalid_lg_registry"),
+        (b'{"schema_version":1,"devices":[{}]}', "invalid_lg_registry"),
+        (b'{"schema_version":2,"devices":[]}', "unsupported_lg_schema"),
+    ],
+)
+def test_lg_registry_errors_use_lg_recovery(tmp_path, raw, reason):
+    registry = LGRegistry(tmp_path / "lg.json")
+    registry.path.write_bytes(raw)
+    with pytest.raises(AgentError) as error:
+        asyncio.run(registry.snapshot())
+    assert error.value.code == ErrorCode.CONFIG_ERROR
+    assert error.value.details["reason"] == reason
+    assert "lg-registry.json" in error.value.details["recovery"]
+    assert "docs/lg-pairing.md" in error.value.details["recovery"]
+    assert "docs/registry.md" not in error.value.details["recovery"]
+    assert registry.path.read_bytes() == raw
+
+
+def test_lg_registry_io_errors_use_lg_recovery(tmp_path, monkeypatch):
+    registry = LGRegistry(tmp_path / "lg.json")
+    monkeypatch.setattr(registry, "_read", Mock(side_effect=PermissionError("private path")))
+    with pytest.raises(AgentError) as error:
+        asyncio.run(registry.snapshot())
+    assert error.value.details["reason"] == "lg_registry_io"
+    assert "lg-pairing.md" in error.value.details["recovery"]
+    assert "private path" not in str(error.value.details)

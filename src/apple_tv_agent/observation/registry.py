@@ -3,6 +3,7 @@
 import json
 import os
 import tempfile
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 from uuid import UUID
@@ -10,9 +11,24 @@ from uuid import UUID
 from pydantic import Field, model_validator
 
 from apple_tv_agent.credentials import NativeCredentialStore
+from apple_tv_agent.errors import AgentError, ErrorCode
 from apple_tv_agent.models import Model
 from apple_tv_agent.observation.discovery import local_host, uuid_udn
-from apple_tv_agent.registry import DeviceRegistry, config_error, unique_fields
+from apple_tv_agent.registry import DeviceRegistry, unique_fields
+
+
+def config_error(reason):
+    return AgentError(
+        ErrorCode.CONFIG_ERROR,
+        details={
+            "reason": reason,
+            "recovery": (
+                "Preserve lg-registry.json before recovery. See the bundled "
+                "apple_tv_agent/docs/lg-pairing.md, also available at "
+                "https://github.com/qwts/apple-tv-agent/blob/main/docs/lg-pairing.md"
+            ),
+        },
+    )
 
 
 class LGCredentials(NativeCredentialStore):
@@ -60,7 +76,28 @@ class LGRegistry(DeviceRegistry):
         if path is None:
             self.path = self.path.with_name("lg-registry.json")
 
+    @asynccontextmanager
+    async def transaction(self):
+        try:
+            async with super().transaction() as data:
+                yield data
+        except AgentError as error:
+            if error.code != ErrorCode.CONFIG_ERROR:
+                raise
+            reason = error.details.get("reason", "invalid_lg_registry")
+            reason = {
+                "invalid_registry": "invalid_lg_registry",
+                "registry_io": "lg_registry_io",
+            }.get(reason, reason)
+            raise config_error(reason) from None
+
     def _read(self):
+        try:
+            return self._read_validated()
+        except ValueError:
+            raise config_error("invalid_lg_registry") from None
+
+    def _read_validated(self):
         try:
             with self.path.open("rb") as stream:
                 raw = stream.read(1024 * 1024 + 1)
