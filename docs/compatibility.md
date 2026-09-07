@@ -6,17 +6,17 @@ Issue: [001](../issues/001-transport-spike.md). Status: **in progress**; hardwar
 
 Candidate transport pin: `pyatv==0.18.0` (MIT, package metadata requires Python >=3.9). Candidate vault dependency: `keyring==25.7.0` (MIT, requires Python >=3.9). Probe tests use `pytest==9.1.1`. These are direct pins in [requirements-spike.txt](../tools/requirements-spike.txt), not a transitive production lock.
 
-The design's Python 3.12 baseline remains a candidate. The available modern interpreter on this Mac is Python 3.14.7; the probe was exercised with it. The probe itself requires Python >=3.11 for `asyncio.timeout`. Python 3.12 installation and native Windows behavior are not yet verified. Do not infer supported platforms from package classifiers alone.
+The design's Python 3.12 baseline remains a candidate. The available modern interpreter on this Mac is Python 3.14.7; the probe was exercised with it. The probe itself requires Python >=3.11 for `asyncio.timeout`. Python 3.12 installation and fake-backed behavior now pass on both hosted OS runners (see CI evidence below); Windows 11 hardware behavior remains unverified. Do not infer supported platforms from package classifiers alone.
 
 The install resolved binary macOS arm64/universal wheels for the compiled dependencies (including aiohttp, cryptography, miniaudio, protobuf, pydantic-core and zeroconf); no local compilation was needed. `pip check` found no broken requirements. Reproduce and lock the validated cross-platform set in issue 002.
 
 Primary references: [pyatv release metadata](https://pypi.org/project/pyatv/0.18.0/), [tagged source](https://github.com/postlund/pyatv/tree/v0.18.0), [keyring release metadata](https://pypi.org/project/keyring/25.7.0/). API findings below were checked against the installed 0.18.0 wheel, not only rolling online docs.
 
-## Observed matrix
+## Local hardware observations
 
 | Check | macOS 26.6.2, arm64, Python 3.14.7 | Native Windows 11 x64 |
 | --- | --- | --- |
-| Fresh venv dependency installation | Pass | Not tested; no Windows runner available |
+| Fresh venv dependency installation | Pass | Not tested on Windows 11; see hosted CI below |
 | Dependency consistency (`pip check`) | Pass | Not tested |
 | Probe unit tests | 17 passed | Not tested |
 | Native backend selected | `keyring.backends.macOS.Keyring` | Not tested; expected `keyring.backends.Windows.WinVaultKeyring` |
@@ -112,3 +112,16 @@ Do not commit raw discovery output, PINs, credentials, device identifiers, netwo
 The first fresh pairing attempt for Play failed; the user reported a possible mistyped PIN. After a user-requested retry in local Terminal, the user confirmed playback resumed. The probe sent at most one Play per successful session and did not retry a dispatched mutation.
 
 Probe result: Play `sent`; playback readback `paused`.
+
+## Automated cross-platform evidence
+
+[GitHub Actions run 34085123063](https://github.com/qwts/apple-tv-agent/actions/runs/34085123063), commit `670d975`, completed successfully on 2026-09-07 UTC. All four jobs installed the pinned direct dependencies, passed `pip check`, selected the expected native keyring backend, and passed all 17 probe tests.
+
+| Runner OS | Architecture | Python | Result |
+| --- | --- | --- | --- |
+| macOS 26.6.2 | arm64 | 3.12.10 | Pass |
+| macOS 26.6.2 | arm64 | 3.14.7 | Pass |
+| Windows Server 2025 | AMD64 | 3.12.10 | Pass |
+| Windows Server 2025 | AMD64 | 3.14.7 | Pass |
+
+Windows selected `keyring.backends.Windows.WinVaultKeyring`; macOS selected `keyring.backends.macOS.Keyring`. CI does not perform native-vault writes or LAN/hardware operations. Windows Server installation and fake-backed test success do not establish Windows 11 interactive pairing or credential persistence.
