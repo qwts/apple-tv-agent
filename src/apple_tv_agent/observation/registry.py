@@ -71,6 +71,8 @@ class LGData(Model):
 
 
 class LGRegistry(DeviceRegistry):
+    data_model = LGData
+
     def __init__(self, path=None):
         super().__init__(path)
         if path is None:
@@ -102,7 +104,7 @@ class LGRegistry(DeviceRegistry):
             with self.path.open("rb") as stream:
                 raw = stream.read(1024 * 1024 + 1)
         except FileNotFoundError:
-            return LGData()
+            return self.data_model()
         if len(raw) > 1024 * 1024:
             raise config_error("invalid_lg_registry")
         data = json.loads(raw, object_pairs_hook=unique_fields)
@@ -112,12 +114,12 @@ class LGRegistry(DeviceRegistry):
             or data["schema_version"] != 1
         ):
             raise config_error("unsupported_lg_schema")
-        if set(data) != {"schema_version", "devices"}:
+        if set(data) != set(self.data_model.model_fields):
             raise config_error("invalid_lg_registry")
-        return LGData.model_validate(data)
+        return self.data_model.model_validate(data)
 
     def _write(self, data):
-        validated = LGData.model_validate(data.model_dump())
+        validated = self.data_model.model_validate(data.model_dump())
         temporary = None
         try:
             with tempfile.NamedTemporaryFile(

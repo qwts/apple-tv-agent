@@ -43,3 +43,7 @@ Fixture checks run on macOS/Windows CI. The existing production service tests co
 Local macOS 26.6.2 arm64 / Python 3.14.7: skill validators, 448 tests (one native-vault opt-in skip), locked dependency checks, source/wheel builds and fresh installed-wheel export checks passed. No real TV action was needed for this documentation/packaging change.
 
 CI validates fresh environments on macOS and Windows Server with Python 3.12/3.14. Windows 11 hardware/native-vault persistence, intentional focused-field typing and the remaining physical-control cases remain release gates. Installation guidance for Codex was checked against [official skill documentation](https://learn.chatgpt.com/docs/build-skills); other clients' installation directories are deliberately not guessed. The skill itself was copied only into temporary validation directories, not installed into the user's agent settings.
+
+## Optional observation fixtures
+
+`tests/skill/fake_screen_cli.py` runs the real experimental parser with synthetic observation metadata from an unrelated working directory. It covers usable, black, expired, wrong-input and input-error cases and validates context eligibility. There is no real image behind the fixture path; these fixtures test result handling, not image recognition. The implementing agent reviewed the new observation reference against these cases; no independent model evaluator was launched.

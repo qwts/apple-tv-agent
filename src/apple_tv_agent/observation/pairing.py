@@ -64,6 +64,8 @@ async def approve(candidate, fingerprint):
 
 async def selected(host, udn, deadline):
     candidates = await discover(host=host, deadline=deadline)
+    if not candidates:
+        raise AgentError(ErrorCode.DEVICE_NOT_FOUND)
     matches = [c for c in candidates if c.udn == udn]
     if len(matches) != 1:
         raise AgentError(ErrorCode.IDENTITY_MISMATCH)

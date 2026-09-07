@@ -63,3 +63,34 @@ def test_walkthrough_cli_runs_outside_checkout(scenario, argv, code, tmp_path):
     if scenario == "next":
         assert data["error"]["details"]["outcome"] == "unknown"
         assert not data["error"]["retryable"]
+
+
+@pytest.mark.parametrize("scenario", ["usable", "black", "expired", "wrong-input", "input-error"])
+def test_observation_walkthrough_fixtures(scenario, tmp_path):
+    from datetime import UTC, datetime
+
+    from apple_tv_agent.observation.models import ScreenObservation
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "tests/skill/fake_screen_cli.py"),
+            scenario,
+            "capture",
+            "--binding",
+            "00000000-0000-0000-0000-000000000001",
+        ],
+        capture_output=True,
+        cwd=tmp_path,
+    )
+    assert result.stderr == b""
+    data = json.loads(result.stdout)
+    if scenario == "input-error":
+        assert result.returncode == 4
+        assert data["error"]["code"] == "FEATURE_UNAVAILABLE"
+    else:
+        assert result.returncode == 0
+        observation = ScreenObservation.model_validate(data["data"])
+        assert observation.eligible_context(observation.binding, now=datetime.now(UTC)) == (
+            scenario == "usable"
+        )

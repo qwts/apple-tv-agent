@@ -32,7 +32,7 @@ Use synthetic SSDP/SSAP/HTTP fixtures for identity, permission, native-vault, re
 
 ## Initial evidence
 
-The reference OLED65C2PUA on firmware 33.31.68 successfully returned 960×540 HDMI screenshots through user-approved SSAP registration. Screenshot-guided profile selection and video navigation worked with the existing Apple TV controls. Windows and a production capture API remain unimplemented.
+The reference OLED65C2PUA on firmware 33.31.68 successfully returned 960×540 HDMI screenshots through user-approved SSAP registration. Screenshot-guided profile selection and video navigation worked with the existing Apple TV controls. This was the initial experiment; production implementation and current evidence follow below.
 
 ## Implementation sequence
 
@@ -41,3 +41,7 @@ Contract prerequisite: [issue 22](https://github.com/qwts/apple-tv-agent/issues/
 Discovery prerequisite: [issue 24](https://github.com/qwts/apple-tv-agent/issues/24) adds bounded SSDP/description discovery and an inspection-only TLS fingerprint command. It creates no trusted registration or credential. Native registration, binding persistence, pinned credential reuse and capture remain open.
 
 Trusted pairing: [issue 26](https://github.com/qwts/apple-tv-agent/issues/26) implements the separate registry/native-vault lifecycle and pinned SSAP registration. HDMI binding, pinned image-service trust, capture artifacts and skill integration remain subsequent work.
+
+## Current implementation
+
+Discovery, provider contract and trusted pairing are merged. [Issue #28](https://github.com/qwts/apple-tv-agent/issues/28) implements explicit bindings, pinned one-shot capture, private artifact cleanup and skill integration. Reference Mac capture and deletion passed; see [current evidence](../docs/lg-capture.md). Keep this parent open for native Windows hardware validation and the remaining visual-navigation checks.
