@@ -39,3 +39,5 @@ The reference OLED65C2PUA on firmware 33.31.68 successfully returned 960×540 HD
 Contract prerequisite: [issue 22](https://github.com/qwts/apple-tv-agent/issues/22), with [provider/trust design](../docs/observation-contract.md). Follow with discovery/trust registration, one-shot capture/CLI, then skill integration and compatibility validation. The contract alone exposes no LG command and does not satisfy the parent hardware acceptance criteria.
 
 Discovery prerequisite: [issue 24](https://github.com/qwts/apple-tv-agent/issues/24) adds bounded SSDP/description discovery and an inspection-only TLS fingerprint command. It creates no trusted registration or credential. Native registration, binding persistence, pinned credential reuse and capture remain open.
+
+Trusted pairing: [issue 26](https://github.com/qwts/apple-tv-agent/issues/26) implements the separate registry/native-vault lifecycle and pinned SSAP registration. HDMI binding, pinned image-service trust, capture artifacts and skill integration remain subsequent work.

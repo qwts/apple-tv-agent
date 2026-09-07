@@ -1,6 +1,6 @@
 # Experimental LG discovery and certificate inspection
 
-The separate `apple-tv-screen` executable is a read-only prerequisite for optional LG observation. It currently supports **discover** and **inspect** only. Pairing, saved trust, capture and skill integration are still pending under [issue 18](https://github.com/qwts/apple-tv-agent/issues/18). The Apple TV CLI is unchanged. No command here reads the native vault, saves a registration or sends remote controls.
+The separate `apple-tv-screen` executable is a read-only prerequisite for optional LG observation. It supports **discover** and **inspect**, plus [trusted pairing and local credential management](lg-pairing.md). Capture and skill integration are still pending under [issue 18](https://github.com/qwts/apple-tv-agent/issues/18). The Apple TV CLI is unchanged. The discovery and inspection commands documented here do not read the native vault, save registrations or send remote controls.
 
 Install using the repository's locked environment and invoke its absolute executable path, as with `apple-tv-agent`. Examples below abbreviate that path. The same commands work in PowerShell when invoked with `&` and the quoted executable path.
 

@@ -36,7 +36,7 @@ dev = [
 packages = ["src/apple_tv_agent"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "schemas", "skills", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md", "docs/controls.md", "docs/troubleshooting.md", "docs/apps-keyboard.md", "docs/lg-discovery.md"]
+include = ["src", "schemas", "skills", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md", "docs/controls.md", "docs/troubleshooting.md", "docs/apps-keyboard.md", "docs/lg-discovery.md", "docs/lg-pairing.md"]
 
 [tool.ruff]
 target-version = "py312"
@@ -57,3 +57,5 @@ select = ["E4", "E7", "E9", "F", "I"]
 "skills/apple-tv-control" = "apple_tv_agent/skills/apple-tv-control"
 
 "docs/lg-discovery.md" = "apple_tv_agent/docs/lg-discovery.md"
+
+"docs/lg-pairing.md" = "apple_tv_agent/docs/lg-pairing.md"
