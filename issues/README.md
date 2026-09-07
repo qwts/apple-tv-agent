@@ -39,3 +39,5 @@ Agent handoff example:
 ## Optional follow-up
 
 [011: Paired LG screen observation](011-lg-screen-observation.md), tracked as [GitHub #18](https://github.com/qwts/apple-tv-agent/issues/18), builds on the successful HDMI screenshot experiment. It is outside the baseline Apple TV release and includes an implementation plan for pairing, image handling, privacy and visual navigation.
+
+[012: Observation provider contract](012-observation-contract.md), tracked as [GitHub #22](https://github.com/qwts/apple-tv-agent/issues/22), defines the typed boundary and trust requirements before implementing the LG provider. Status: in review.

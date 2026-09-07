@@ -33,3 +33,7 @@ Use synthetic SSDP/SSAP/HTTP fixtures for identity, permission, native-vault, re
 ## Initial evidence
 
 The reference OLED65C2PUA on firmware 33.31.68 successfully returned 960×540 HDMI screenshots through user-approved SSAP registration. Screenshot-guided profile selection and video navigation worked with the existing Apple TV controls. Windows and a production capture API remain unimplemented.
+
+## Implementation sequence
+
+Contract prerequisite: [issue 22](https://github.com/qwts/apple-tv-agent/issues/22), with [provider/trust design](../docs/observation-contract.md). Follow with discovery/trust registration, one-shot capture/CLI, then skill integration and compatibility validation. The contract alone exposes no LG command and does not satisfy the parent hardware acceptance criteria.

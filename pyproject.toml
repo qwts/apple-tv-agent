@@ -44,6 +44,7 @@ line-length = 100
 select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"schemas/observation-v1.json" = "apple_tv_agent/observation-v1.json"
 "schemas/response-v1.json" = "apple_tv_agent/response-v1.json"
 "docs/registry.md" = "apple_tv_agent/docs/registry.md"
 "docs/pairing.md" = "apple_tv_agent/docs/pairing.md"
