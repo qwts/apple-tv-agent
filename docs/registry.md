@@ -12,7 +12,7 @@ Registration is an internal operation for issue 004's pairing implementation. It
 - `devices alias --device UUID --name living-room` adds a unique, case-sensitive alias. Repeating it is idempotent. An alias cannot equal any registered UUID or another device's alias, or start with the reserved `candidate-` prefix. Unicode and spaces are preserved.
 - `devices default --device UUID_OR_ALIAS` changes the default. No other operation automatically sets it.
 
-Selection order is explicit UUID/alias, saved default, then sole registered device. Invalid explicit selections never fall back. Multiple eligible devices return `DEVICE_AMBIGUOUS` with IDs/name/address hints; no eligible device returns `DEVICE_NOT_FOUND`. A new candidate requires its explicit candidate ID for pairing. Pairing and credential removal are documented in [pairing.md](pairing.md); status/control remain upcoming issues.
+Selection order is explicit UUID/alias, saved default, then sole registered device. Invalid explicit selections never fall back. Multiple eligible devices return `DEVICE_AMBIGUOUS` with IDs/name/address hints; no eligible device returns `DEVICE_NOT_FOUND`. A new candidate requires its explicit candidate ID for pairing. Pairing and credential removal are documented in [pairing.md](pairing.md); status and control commands use the same selection rules.
 
 ## Storage and recovery
 

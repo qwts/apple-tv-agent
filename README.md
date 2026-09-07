@@ -45,6 +45,8 @@ Capabilities depend on the TV, active app and audio/display setup. The baseline 
 - [DESIGN.md](DESIGN.md): architecture, contracts and release boundaries.
 - [Issue backlog](issues/README.md): implementation plans and validation evidence.
 - [CLI contract and development checks](docs/cli-contract.md): locked setup, tests and package builds.
+- [Release validation](https://github.com/qwts/apple-tv-agent/blob/main/docs/release-validation.md): automated evidence, local artifact reproduction and outstanding hardware gates.
+- [Hardware runbook](https://github.com/qwts/apple-tv-agent/blob/main/docs/hardware-validation.md): opt-in Mac/Windows tests with isolated accounts and cleanup.
 - [Skill validation](docs/skill-validation.md): portable packaging checks and fake-CLI walkthroughs.
 
 The project uses pinned [pyatv](https://pyatv.dev/documentation/) APIs behind a stable CLI adapter and is independent of Apple and pyatv. Build artifacts remain local until publication is explicitly requested.

@@ -21,7 +21,7 @@ Read [DESIGN.md](../DESIGN.md) before implementation. Its contracts and release 
 
 ## Acceptance criteria
 
-- [ ] CI passes on macOS and Windows from a clean checkout without LAN dependencies.
+- [x] CI passes on macOS and Windows from a clean checkout without LAN dependencies.
 - [ ] Baseline discovery, pairing, status and pause/navigation pass on real Apple TV hardware from both host OSes before release is declared ready.
 - [ ] Capability-dependent features have explicit results; missing hardware results remain not-tested and block unsupported compatibility claims.
 - [ ] A fresh local installation follows README successfully and artifacts contain no private data.
@@ -33,3 +33,9 @@ Run the full automated suite once per supported matrix entry, then the documente
 ## Completion evidence
 
 When complete, record changed files, exact validation commands and results, host/device versions where relevant, and remaining limitations here. Update status only after acceptance criteria are satisfied. Never record secrets or raw sensitive logs.
+
+## Implementation progress
+
+The existing four-job CI matrix now covers the complete CLI and portable skill (448 tests passed, one opt-in skip per job in run 34141985450). Added [hardware runbook](../docs/hardware-validation.md) with dedicated OS-account isolation, full control/recovery matrix, upgrade checks, sanitized evidence and explicit cleanup. Added [release ledger](../docs/release-validation.md) with artifact reproduction commands and evidence boundaries.
+
+Status remains **open**: no native Windows 11 test host is available in this session. Both-host hardware acceptance and the remaining Mac release matrix must be completed before release readiness. This documentation PR does not close the issue.
