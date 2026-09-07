@@ -1,7 +1,7 @@
 # 002: Create the Python package and JSON CLI contract
 
 GitHub: https://github.com/qwts/apple-tv-agent/issues/2
-Status: in progress
+Status: in review
 Priority: P0
 Depends on: [001](001-transport-spike.md)
 
@@ -21,9 +21,9 @@ Read [DESIGN.md](../DESIGN.md) before implementation. Its contracts and release 
 
 ## Acceptance criteria
 
-- [ ] Fresh local wheel installation exposes both entry points on macOS and Windows.
-- [ ] Success, parser failure and unexpected exception outputs conform to the schema and exit mapping.
-- [ ] Invalid inputs cause no discovery, credential access or device mutation.
+- [x] Fresh local wheel installation exposes both entry points on macOS and Windows.
+- [x] Success, parser failure and unexpected exception outputs conform to the schema and exit mapping.
+- [x] Invalid inputs cause no discovery, credential access or device mutation.
 
 ## Validation
 
@@ -41,4 +41,4 @@ When complete, record changed files, exact validation commands and results, host
 - Fresh local macOS wheel installation passed from a temporary directory containing spaces. CI now repeats fresh wheel installation and both-entry-point checks on macOS and Windows with Python 3.12/3.14.
 - Issue 001 remains open for Windows 11 hardware and native-vault persistence. This issue implements the development contract without waiving those release gates.
 
-Local validation: **143 tests passed** (contract and existing transport suites); Ruff checks/formatting, lock consistency, dependency checks, source/wheel build, and fresh wheel entry-point smoke tests passed on macOS arm64 / Python 3.14.7. Cross-platform CI pending.
+Local validation: **143 tests passed** (contract and existing transport suites); Ruff checks/formatting, lock consistency, dependency checks, source/wheel build, and fresh wheel entry-point smoke tests passed on macOS arm64 / Python 3.14.7. All four cross-platform CI jobs passed in [run 34088665314](https://github.com/qwts/apple-tv-agent/actions/runs/34088665314): macOS and Windows, each on Python 3.12 and 3.14, including all 143 tests and clean wheel installation. Implementation PR: [#12](https://github.com/qwts/apple-tv-agent/pull/12).
