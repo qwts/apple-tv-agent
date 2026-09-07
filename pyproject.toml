@@ -34,12 +34,15 @@ dev = [
   "uv==0.12.10",
   "PyYAML==6.0.3",
 ]
+release = [
+    "pyinstaller==6.22.2",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/apple_tv_agent"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "schemas", "skills", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md", "docs/controls.md", "docs/troubleshooting.md", "docs/apps-keyboard.md", "docs/lg-discovery.md", "docs/lg-pairing.md", "docs/lg-capture.md"]
+include = ["src", "schemas", "skills", "pyproject.toml", "README.md", "docs/cli-contract.md", "docs/registry.md", "docs/pairing.md", "docs/sessions.md", "docs/controls.md", "docs/troubleshooting.md", "docs/apps-keyboard.md", "docs/lg-discovery.md", "docs/lg-pairing.md", "docs/lg-capture.md", "docs/downloads.md", "docs/release-pipeline.md"]
 
 [tool.ruff]
 target-version = "py312"
@@ -64,3 +67,6 @@ select = ["E4", "E7", "E9", "F", "I"]
 "docs/lg-pairing.md" = "apple_tv_agent/docs/lg-pairing.md"
 
 "docs/lg-capture.md" = "apple_tv_agent/docs/lg-capture.md"
+
+"docs/downloads.md" = "apple_tv_agent/docs/downloads.md"
+"docs/release-pipeline.md" = "apple_tv_agent/docs/release-pipeline.md"

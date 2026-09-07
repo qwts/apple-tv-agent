@@ -1,0 +1,9 @@
+{
+  "validated_version": null,
+  "platforms": {
+    "macos-arm64": "not-tested",
+    "macos-x86_64": "not-tested",
+    "windows-x86_64": "not-tested",
+    "linux-x86_64": "not-tested"
+  }
+}

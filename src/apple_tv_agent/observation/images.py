@@ -92,10 +92,13 @@ async def decode_image(raw, *, deadline):
     process = None
     try:
         async with asyncio.timeout_at(deadline):
+            worker = (
+                [sys.executable, "--internal-image-worker"]
+                if getattr(sys, "frozen", False)
+                else [sys.executable, "-m", "apple_tv_agent.observation.image_worker"]
+            )
             process = await asyncio.create_subprocess_exec(
-                sys.executable,
-                "-m",
-                "apple_tv_agent.observation.image_worker",
+                *worker,
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.DEVNULL,

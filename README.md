@@ -1,12 +1,14 @@
 # Apple TV Agent
 
-Control a local Apple TV from an agent running on your Mac or Windows computer. The Python CLI discovers and pairs devices, reads status, sends remote/playback/power/volume commands, launches installed apps, and appends text to focused inputs. The portable [apple-tv-control skill](skills/apple-tv-control/SKILL.md) teaches an agent how to use those commands and interpret their results.
+Control a local Apple TV from an agent running on macOS, Windows or a Linux desktop with Secret Service. The Python CLI discovers and pairs devices, reads status, sends remote/playback/power/volume commands, launches installed apps, and appends text to focused inputs. The portable [apple-tv-control skill](skills/apple-tv-control/SKILL.md) teaches an agent how to use those commands and interpret their results.
 
-**Development preview:** macOS hardware has been exercised; macOS/Windows CI checks installation and simulated behavior on Python 3.12/3.14. Windows 11 TV/native-vault hardware validation remains open. See [compatibility evidence](docs/compatibility.md). There is no published package-index release yet.
+**Development preview:** macOS hardware has been exercised; macOS/Windows CI checks installation and simulated behavior on Python 3.12/3.14. Windows 11 and Linux TV/native-vault hardware validation remains open. See [compatibility evidence](docs/compatibility.md). There is no published package-index release yet.
 
 ## Install
 
-Clone a reviewed revision of this repository, then follow the [macOS or PowerShell setup instructions](skills/apple-tv-control/references/setup.md). They install the locked environment and use absolute executable paths, so you do not need shell activation or a particular working directory.
+For versioned native bundles with Python included, follow [download and installation](docs/downloads.md). The [release pipeline](docs/release-pipeline.md) produces drafts for maintainer review; no stable support claim is made.
+
+For source installation, clone a reviewed revision of this repository, then follow the [macOS or PowerShell setup instructions](skills/apple-tv-control/references/setup.md). They install the locked environment and use absolute executable paths, so you do not need shell activation or a particular working directory.
 
 Install the CLI and skill separately:
 
@@ -32,7 +34,7 @@ apple-tv-agent apps list --device REGISTERED_UUID
 apple-tv-agent apps launch --device REGISTERED_UUID --app-id EXACT_INSTALLED_APP_ID
 ```
 
-Pairing runs in your own interactive terminal with hidden PIN entry. Verified credentials stay in macOS Keychain or Windows Credential Manager; each computer pairs independently. No Apple ID password or developer account is required. See [pairing and recovery](docs/pairing.md).
+Pairing runs in your own interactive terminal with hidden PIN entry. Verified credentials stay in macOS Keychain, Windows Credential Manager or Linux Secret Service; each computer pairs independently. No Apple ID password or developer account is required. See [pairing and recovery](docs/pairing.md).
 
 Once paired, ask the agent “pause the living room Apple TV,” “open YouTube,” or “tell me what is playing.” Explicit UUID/alias selection takes precedence over a saved default or the sole registered TV. Ambiguous devices require a choice before control.
 
@@ -46,7 +48,7 @@ Capabilities depend on the TV, active app and audio/display setup. The baseline 
 - [Issue backlog](issues/README.md): implementation plans and validation evidence.
 - [CLI contract and development checks](docs/cli-contract.md): locked setup, tests and package builds.
 - [Release validation](https://github.com/qwts/apple-tv-agent/blob/main/docs/release-validation.md): automated evidence, local artifact reproduction and outstanding hardware gates.
-- [Hardware runbook](https://github.com/qwts/apple-tv-agent/blob/main/docs/hardware-validation.md): opt-in Mac/Windows tests with isolated accounts and cleanup.
+- [Hardware runbook](https://github.com/qwts/apple-tv-agent/blob/main/docs/hardware-validation.md): opt-in Mac/Windows/Linux tests with isolated accounts and cleanup.
 - [Skill validation](docs/skill-validation.md): portable packaging checks and fake-CLI walkthroughs.
 
 The project uses pinned [pyatv](https://pyatv.dev/documentation/) APIs behind a stable CLI adapter and is independent of Apple and pyatv. Build artifacts remain local until publication is explicitly requested.

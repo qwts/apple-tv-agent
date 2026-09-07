@@ -1,12 +1,16 @@
 # Setup and local pairing
 
-The skill needs a local execution-capable agent, native macOS or Windows, Python 3.12+, LAN access to the TV and the user's native credential store. Each computer pairs independently. The project is a development package, not a published package-index release. Install from a reviewed checkout of https://github.com/qwts/apple-tv-agent; use the committed uv.lock and keep that checkout at a stable path.
+The skill needs a local execution-capable agent, macOS, Windows or Linux with a Secret Service desktop session, LAN access to the TV and the user's native credential store. Each computer pairs independently. The project is a development package, not a published package-index release. Install from a reviewed checkout of https://github.com/qwts/apple-tv-agent; use the committed uv.lock and keep that checkout at a stable path.
+
+## Downloaded bundle
+
+For a user-selected GitHub release, extract the entire OS/architecture archive into a stable location and verify its SHA256SUMS entry. Give the agent absolute paths to apple-tv-agent and apple-tv-screen (with .exe on Windows); keep their _internal directory beside them. Python/uv installation and the module-form fallback are unnecessary for bundles. Run --version and doctor before pairing. Copy the complete bundled skills/apple-tv-control folder into the client skill location. Preview binaries are unsigned (Mac ad-hoc, not notarized); respect OS trust prompts and do not disable protections. Linux requires a signed-in desktop D-Bus session with an unlocked Secret Service provider, with no plaintext fallback.
 
 ## Package installation
 
 The following commands intentionally name the checkout and interpreter. Replace the example path with the actual reviewed checkout. Python 3.14 is shown; CI also checks 3.12. No shell activation is required.
 
-macOS (zsh/bash):
+macOS/Linux (zsh/bash; source install requires Python 3.12+):
 
 ```sh
 repo='/absolute/path/Apple TV Agent'
@@ -42,7 +46,7 @@ Run `discover` with that executable. A discovery candidate is not a registered d
 & 'C:\path\Apple TV Agent\.venv\Scripts\apple-tv-agent.exe' pair --device CANDIDATE_ID
 ```
 
-The CLI displays local pairing prompts and reads the TV PIN with hidden input. It verifies protocol credentials before storing them in macOS Keychain or Windows Credential Manager. Pairing may have per-protocol partial results; read them before claiming completion. Agents running without a TTY must hand this step to the user, not pipe a PIN or create a fake terminal to collect it in chat.
+The CLI displays local pairing prompts and reads the TV PIN with hidden input. It verifies protocol credentials before storing them in macOS Keychain, Windows Credential Manager or Linux Secret Service. Pairing may have per-protocol partial results; read them before claiming completion. Agents running without a TTY must hand this step to the user, not pipe a PIN or create a fake terminal to collect it in chat.
 
 After pairing, use `devices list` to obtain the registered UUID. Verify `status --device UUID`, then run the requested action after checking capabilities. Aliases/defaults are explicit preferences, changed only when requested via `devices alias --device UUID --name living-room` or `devices default --device UUID`.
 

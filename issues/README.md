@@ -14,7 +14,7 @@ The implementation plans are maintained here and tracked as [GitHub issues](http
 | [008: Add actionable local diagnostics and recovery guidance](008-diagnostics.md) | P1 | 005 | Complete |
 | [009: Author and package the portable Apple TV control skill](009-agent-skill.md) | P0 | 006, 007, 008 | In review |
 | [010: Complete cross-platform CI and real-device release validation](010-validation-release.md) | P0 | 009 | Open |
-| [016: Versioned GitHub release bundles](016-release-pipeline.md) | P1 | 010; coordinate optional LG validation with 011–015 | Open |
+| [016: Versioned GitHub release bundles](016-release-pipeline.md) | P1 | 010; coordinate optional LG validation with 011–015 | In review |
 
 Suggested sequence: 001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 016. Issue 008 can start after 005 independently of control implementation.
 

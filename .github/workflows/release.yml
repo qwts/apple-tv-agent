@@ -1,0 +1,192 @@
+name: Release bundles
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - 'tools/release/**'
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - 'release-gates.json'
+      - 'docs/**'
+      - 'skills/**'
+      - 'schemas/**'
+      - 'tests/unit/test_release.py'
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  identity:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - run: python -m pip install uv==0.12.10
+      - run: uv sync --locked --extra screen --group release
+      - name: Validate version and stable release gates
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+        shell: bash
+        run: |
+          if [ "$IS_TAG" = true ]; then
+            uv run --no-sync python tools/release/version.py --tag "$RELEASE_TAG"
+          else
+            uv run --no-sync python tools/release/version.py
+          fi
+      - run: uv run --no-sync pytest -q tests/unit/test_release.py
+      - run: uv run --no-sync ruff check tools/release tests/unit/test_release.py
+      - run: uv run --no-sync ruff format --check tools/release tests/unit/test_release.py
+
+  bundle:
+    needs: identity
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: macos-arm64
+          - os: macos-15-intel
+            target: macos-x86_64
+          - os: windows-2022
+            target: windows-x86_64
+          - os: ubuntu-22.04
+            target: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - run: python -m pip install uv==0.12.10
+      - run: uv sync --locked --extra screen --group release
+      - run: uv run --no-sync python tools/release/build_bundle.py --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: bundle-${{ matrix.target }}
+          path: release-dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  smoke:
+    needs: bundle
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: macos-arm64
+          - os: macos-15-intel
+            target: macos-x86_64
+          - os: windows-2022
+            target: windows-x86_64
+          - os: ubuntu-22.04
+            target: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: bundle-${{ matrix.target }}
+          path: release-dist
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - run: python -m pip install uv==0.12.10
+      - run: uv sync --locked --extra screen --group release
+      - name: Check downloaded archive with empty application PATH
+        shell: bash
+        run: |
+          for archive in release-dist/*.tar.gz release-dist/*.zip; do
+            if [ -f "$archive" ]; then
+              uv run --no-sync python tools/release/check_bundle.py "$archive"
+            fi
+          done
+      - name: Offline tests including Linux credential refusal
+        run: uv run --no-sync pytest -q
+
+  python-package:
+    needs: identity
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - run: python -m pip install uv==0.12.10
+      - run: uv sync --locked --extra screen --group release
+      - run: uv run --no-sync python -m build --no-isolation
+      - name: Hash Python packages
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          for path in Path('dist').iterdir():
+              path.with_name(path.name + '.sha256').write_text(f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: python-package
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  draft-release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [identity, smoke, python-package]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - run: python -m pip install uv==0.12.10
+      - run: uv sync --locked --extra screen --group release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: bundle-*
+          merge-multiple: true
+          path: release-dist
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: python-package
+          path: release-dist
+      - name: Create draft from complete verified asset set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          SOURCE_COMMIT: ${{ github.sha }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+        run: >-
+          uv run --no-sync python tools/release/publish.py
+          --tag "$RELEASE_TAG" --commit "$SOURCE_COMMIT"
+          --repository "$SOURCE_REPOSITORY" --assets release-dist
