@@ -75,6 +75,21 @@ def main():
                 for command in entrypoints
             ]
             check_results(results, expected)
+        screen = scripts / ("apple-tv-screen.exe" if os.name == "nt" else "apple-tv-screen")
+        for argv, expected in [(["--help"], 0), (["inspect"], 2)]:
+            results = [
+                subprocess.run(command + argv, capture_output=True, cwd=base, env=env)
+                for command in (
+                    [str(screen)],
+                    [str(python), "-m", "apple_tv_agent.observation.cli"],
+                )
+            ]
+            if any(r.returncode != expected or r.stderr for r in results):
+                raise RuntimeError("Screen entry point failed smoke check.")
+            if expected and any(
+                json.loads(r.stdout)["error"]["code"] != "INVALID_ARGUMENT" for r in results
+            ):
+                raise RuntimeError("Screen validation error differs from contract.")
         resource_result = subprocess.run(
             [
                 str(python),
