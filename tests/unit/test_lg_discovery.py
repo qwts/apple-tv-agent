@@ -80,6 +80,7 @@ def test_packet_bounds_and_duplicate_headers():
         XML[:80],
         b"x" * (lg.MAX_DESCRIPTION + 1),
     ],
+    ids=["wrong-udn", "wrong-maker", "duplicate-udn", "dtd", "utf16", "truncated", "oversized"],
 )
 def test_untrusted_xml(raw):
     assert lg.parse_description(raw, AD) is None
