@@ -1,0 +1,35 @@
+name: Transport probe
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install probe dependencies
+        run: python -m pip install -r tools/requirements-spike.txt
+      - name: Check dependency consistency
+        run: python -m pip check
+      - name: Inspect runtime and native backend selection
+        run: python tools/transport_probe.py environment
+      - name: Test without a TV or vault secrets
+        run: python -m pytest -q

@@ -1,10 +1,10 @@
 # Implementation issues
 
-These Markdown files are the local issue tracker; no hosted issues or remote repository are required. All issues start open. P0 denotes a foundation or release gate; P1 work is also included in the planned release. Dependencies determine execution order, not priority alone.
+These Markdown files are the local issue tracker; no hosted issues or remote repository are required. Issue status and evidence are maintained in each file. P0 denotes a foundation or release gate; P1 work is also included in the planned release. Dependencies determine execution order, not priority alone.
 
 | Issue | Priority | Depends on | Status |
 | --- | --- | --- | --- |
-| [001: Validate pyatv and cross-platform feasibility](001-transport-spike.md) | P0 | — | Open |
+| [001: Validate pyatv and cross-platform feasibility](001-transport-spike.md) | P0 | — | In progress |
 | [002: Create the Python package and JSON CLI contract](002-package-contract.md) | P0 | 001 | Open |
 | [003: Implement discovery, durable identity and device selection](003-discovery-registry.md) | P0 | 002 | Open |
 | [004: Implement native credentials and interactive pairing](004-credentials-pairing.md) | P0 | 003 | Open |

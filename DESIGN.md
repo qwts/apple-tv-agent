@@ -6,7 +6,7 @@ Status: proposed, implementation pending. Research checked 2026-09-06. Decisions
 
 Provide a portable agent skill backed by a deterministic local CLI. A user can discover and pair a TV once, then use natural-language requests to operate the correct device and receive honest results.
 
-Release scope: Apple TV HD/4K; macOS on Apple Silicon and Intel where test infrastructure permits; native Windows 11 x64. Python 3.12 is the initial candidate, subject to the transport spike. Pin a tested pyatv release rather than relying on rolling documentation. Record exact OS, architecture, Python, pyatv, and tvOS versions in the compatibility report. Other devices and platforms are unverified.
+Release scope: Apple TV HD/4K; macOS on Apple Silicon and Intel where test infrastructure permits; native Windows 11 x64. Python 3.12 is the initial candidate, subject to the transport spike. The issue 001 candidate pin is pyatv 0.18.0; macOS Python 3.14.7 installation, native Keychain access, TV discovery, pairing and basic playback have evidence; Python 3.12, Windows and remaining control semantics are open gates. See [compatibility evidence](docs/compatibility.md). Pin a tested pyatv release rather than relying on rolling documentation. Record exact OS, architecture, Python, pyatv, and tvOS versions in the compatibility report. Other devices and platforms are unverified.
 
 MVP includes discovery, device aliases/default, interactive pairing, credential removal, diagnostics, status, capabilities, navigation, playback, power, volume, installed-app listing/launch, and conditional keyboard text input. Every device action is capability-gated. Unsupported features may be reported as unsupported without blocking baseline release; baseline discovery, pairing, status and pause/navigation must work on the reference TV from both host OSes.
 
@@ -50,7 +50,7 @@ Use the library storage interface through a project-owned adapter. pyatv's stora
 
 ## Discovery and identity
 
-`discover` performs a bounded LAN scan, returns candidates and exits successfully with an empty list if none are found. `--host ADDRESS` performs targeted discovery as a fallback, never a subnet sweep. Validate literal IPv4/IPv6 addresses and do not claim targeted discovery bypasses network filtering.
+`discover` performs a bounded LAN scan, returns candidates and exits successfully with an empty list if none are found. `--host ADDRESS` performs targeted discovery as a fallback, never a subnet sweep. Validate literal IPv4 addresses and reject IPv6 with an explicit unsupported-address explanation: the selected pyatv 0.18.0 scan implementation uses IPv4Address. Do not claim targeted discovery bypasses network filtering.
 
 Create a project device UUID on registration, retaining the observed protocol identifiers needed to match subsequent discoveries. Names and IP addresses are display/address hints, not durable identity. Match identifiers before supplying credentials. A changed address with matching identity is acceptable; a changed identity at the old address produces `IDENTITY_MISMATCH` and requires explicit pairing. Never silently merge conflicting identities.
 

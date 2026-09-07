@@ -26,7 +26,7 @@ Read [DESIGN.md](../DESIGN.md) before implementation. Its contracts and release 
 
 ## Validation
 
-Test zero/one/many devices, alias collisions, explicit/default selection, mixed protocol identifiers, IPv4/IPv6, corrupt schema, concurrent writers and changed identities with fake scans.
+Test zero/one/many devices, alias collisions, explicit/default selection, mixed protocol identifiers, IPv4 and explicit IPv6 rejection, corrupt schema, concurrent writers and changed identities with fake scans.
 
 ## Completion evidence
 
