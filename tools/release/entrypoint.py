@@ -7,6 +7,20 @@ from pathlib import Path
 
 
 def main():
+    if sys.argv[1:] == ["--internal-runtime-check"]:
+        import importlib
+        from importlib.resources import files
+
+        package = files("apple_tv_agent")
+        for name in ("response-v1.json", "observation-v1.json", "observation/lg-manifest.json"):
+            json.loads(package.joinpath(name).read_text(encoding="utf-8"))
+        for name in ("docs/pairing.md", "docs/lg-capture.md", "skills/apple-tv-control/SKILL.md"):
+            if not package.joinpath(name).read_text(encoding="utf-8"):
+                raise RuntimeError("Empty bundled resource")
+        backend = {"darwin": "macOS", "win32": "Windows", "linux": "SecretService"}[sys.platform]
+        importlib.import_module("keyring.backends." + backend)
+        print(json.dumps({"resources": "passed", "backend_import": "passed"}))
+        return 0
     if sys.argv[1:] == ["--internal-image-worker"]:
         from apple_tv_agent.observation.image_worker import main as worker
 

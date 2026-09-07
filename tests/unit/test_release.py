@@ -142,3 +142,40 @@ def test_workflow_publication_requires_all_validation():
     for job in jobs.values():
         assert job["timeout-minutes"] <= 20
         assert "self-hosted" not in job["runs-on"]
+
+
+def test_publish_creates_only_draft_and_propagates_failure(monkeypatch, tmp_path):
+    import subprocess
+
+    monkeypatch.setattr(publish, "ROOT", tmp_path)
+    (tmp_path / "uv.lock").write_text("synthetic lock")
+    assets = tmp_path / "assets"
+    assets.mkdir()
+    monkeypatch.setattr(publish, "publication_version", lambda tag: "1.0.0a1")
+    monkeypatch.setattr(
+        publish, "verify_assets", lambda directory, value: ({"bundle.zip"}, "hash  bundle.zip\n")
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "publish.py",
+            "--tag",
+            "v1.0.0a1",
+            "--assets",
+            str(assets),
+            "--commit",
+            "a" * 40,
+            "--repository",
+            "owner/repo",
+        ],
+    )
+    execute = Mock(side_effect=subprocess.CalledProcessError(1, "gh"))
+    monkeypatch.setattr(publish.subprocess, "run", execute)
+    with pytest.raises(subprocess.CalledProcessError):
+        publish.main()
+    execute.assert_called_once()
+    command = execute.call_args.args[0]
+    assert command[:3] == ["gh", "release", "create"]
+    assert "--draft" in command and "--prerelease" in command and "--verify-tag" in command
+    assert not any(word in command for word in ("--clobber", "delete", "edit"))

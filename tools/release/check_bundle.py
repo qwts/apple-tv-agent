@@ -90,6 +90,9 @@ def check(archive):
             response = json.loads(invoke(tool, args, expected=2))
             if response["ok"] or response["error"]["code"] != "INVALID_ARGUMENT":
                 raise ValueError("Invalid JSON contract")
+        runtime = json.loads(invoke("apple-tv-agent", ["--internal-runtime-check"]))
+        if runtime != {"resources": "passed", "backend_import": "passed"}:
+            raise ValueError("Bundled resources/native backend import failed")
         # Doctor is read-only; platform keyring absence is valid on headless runners.
         doctor = json.loads(invoke("apple-tv-agent", ["doctor"]))
         checks = doctor["data"]["checks"]

@@ -19,7 +19,8 @@ def run(*args):
 
 
 def digest(path):
-    return hashlib.file_digest(path.open("rb"), "sha256").hexdigest()
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def build(target):
@@ -54,7 +55,12 @@ def build(target):
     shutil.copytree(ROOT / "skills", stage / "skills")
     shutil.copytree(ROOT / "schemas", stage / "schemas")
     shutil.copytree(ROOT / "docs", stage / "docs")
-    shutil.copy2(ROOT / "docs/downloads.md", stage / "README.md")
+    (stage / "README.md").write_text(
+        "# Apple TV Agent\n\n"
+        "Start with [download, setup and upgrade instructions](docs/downloads.md). "
+        "Keep both executables beside the _internal directory. Python is included. "
+        "The portable agent skill is in skills/apple-tv-control.\n"
+    )
     notices = stage / "licenses"
     notices.mkdir()
     # Include distribution metadata and shipped license texts, including build/runtime components.
@@ -66,7 +72,11 @@ def build(target):
         directory.mkdir(exist_ok=True)
         (directory / "METADATA.txt").write_text(dist.read_text("METADATA") or "", encoding="utf-8")
         for file in dist.files or []:
-            if any(token in file.name.lower() for token in ("license", "copying", "notice")):
+            if any(
+                token in part.lower()
+                for part in file.parts
+                for token in ("license", "copying", "notice")
+            ):
                 source = Path(dist.locate_file(file))
                 if source.is_file():
                     destination = directory / str(file).replace("/", "_").replace("\\", "_")

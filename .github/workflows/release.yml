@@ -144,7 +144,7 @@ jobs:
           python - <<'PY'
           import hashlib
           from pathlib import Path
-          for path in Path('dist').iterdir():
+          for path in list(Path('dist').glob('*.whl')) + list(Path('dist').glob('*.tar.gz')):
               path.with_name(path.name + '.sha256').write_text(f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n')
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
