@@ -252,3 +252,35 @@ def test_expired_deadline_closes_discovery(monkeypatch):
     with pytest.raises(AgentError) as error:
         asyncio.run(run())
     assert error.value.code == ErrorCode.TIMEOUT
+
+
+@pytest.mark.parametrize("error", [asyncio.CancelledError(), KeyboardInterrupt()])
+def test_cli_cancellation_keeps_json_envelope(error, monkeypatch, capsys):
+    monkeypatch.setattr(cli, "dispatch", AsyncMock(side_effect=error))
+    assert cli.main(["discover"]) == 1
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert json.loads(captured.out)["error"]["code"] == "INTERNAL_ERROR"
+
+
+def test_help_still_exits_successfully(capsys):
+    with pytest.raises(SystemExit) as error:
+        cli.main(["--help"])
+    assert error.value.code == 0
+    assert "usage:" in capsys.readouterr().out
+
+
+def test_missing_tls_metadata_is_network_error_and_aborts(monkeypatch):
+    from unittest.mock import Mock
+
+    writer = Mock()
+    writer.get_extra_info.return_value = None
+    monkeypatch.setattr(lg.asyncio, "open_connection", AsyncMock(return_value=(None, writer)))
+
+    async def run():
+        return await lg.inspect_certificate(HOST, deadline=asyncio.get_running_loop().time() + 1)
+
+    with pytest.raises(AgentError) as error:
+        asyncio.run(run())
+    assert error.value.code == ErrorCode.NETWORK_ERROR
+    writer.transport.abort.assert_called_once_with()

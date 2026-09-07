@@ -52,7 +52,7 @@ def main(argv=None):
         data = asyncio.run(dispatch(args))
         result = {"schema_version": 1, "command": command, "ok": True, "data": data, "error": None}
         code = 0
-    except (Exception, KeyboardInterrupt) as exc:
+    except (Exception, KeyboardInterrupt, asyncio.CancelledError) as exc:
         error = exc if isinstance(exc, AgentError) else AgentError(ErrorCode.INTERNAL_ERROR)
         # No raw exception, peer payload, URL, or user-provided invalid argument.
         code, message = ERRORS[error.code]

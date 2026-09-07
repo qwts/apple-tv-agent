@@ -245,7 +245,10 @@ async def inspect_certificate(host: str, *, deadline: float) -> str:
     try:
         async with asyncio.timeout_at(deadline):
             _, writer = await asyncio.open_connection(host, 3001, ssl=context, server_hostname=host)
-            cert = writer.get_extra_info("ssl_object").getpeercert(binary_form=True)
+            tls = writer.get_extra_info("ssl_object")
+            if tls is None:
+                raise OSError
+            cert = tls.getpeercert(binary_form=True)
             if not cert:
                 raise OSError
             return hashlib.sha256(cert).hexdigest()
