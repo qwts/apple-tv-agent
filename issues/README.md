@@ -43,3 +43,5 @@ Agent handoff example:
 [012: Observation provider contract](012-observation-contract.md), tracked as [GitHub #22](https://github.com/qwts/apple-tv-agent/issues/22), defines the typed boundary and trust requirements before implementing the LG provider. Status: in review.
 
 [013: LG discovery and certificate inspection](013-lg-discovery.md), tracked as [GitHub #24](https://github.com/qwts/apple-tv-agent/issues/24), implements the read-only prerequisite to trusted pairing. Status: in review.
+
+[014: Trusted LG pairing](014-lg-pairing.md), tracked as [GitHub #26](https://github.com/qwts/apple-tv-agent/issues/26), implements local certificate/permission approval, native credential persistence, reconnect verification and local removal.

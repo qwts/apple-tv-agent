@@ -18,6 +18,8 @@ def vault_error(reason="vault_unavailable"):
 
 
 class NativeCredentialStore:
+    service = "apple-tv-agent"
+
     def __init__(self):
         import keyring
 
@@ -47,7 +49,7 @@ class NativeCredentialStore:
 
     def get(self, device_id, protocol):
         try:
-            return self.backend.get_password("apple-tv-agent", self.account(device_id, protocol))
+            return self.backend.get_password(self.service, self.account(device_id, protocol))
         except Exception:
             raise vault_error() from None
 
@@ -56,16 +58,16 @@ class NativeCredentialStore:
         previous = self.get(device_id, protocol)
         account = self.account(device_id, protocol)
         try:
-            self.backend.set_password("apple-tv-agent", account, value)
-            if self.backend.get_password("apple-tv-agent", account) != value:
+            self.backend.set_password(self.service, account, value)
+            if self.backend.get_password(self.service, account) != value:
                 raise vault_error("write_unverified")
         except Exception:
             try:
                 if previous is None:
                     self.delete(device_id, protocol)
                 else:
-                    self.backend.set_password("apple-tv-agent", account, previous)
-                    if self.backend.get_password("apple-tv-agent", account) != previous:
+                    self.backend.set_password(self.service, account, previous)
+                    if self.backend.get_password(self.service, account) != previous:
                         raise vault_error()
             except Exception:
                 raise vault_error("write_failed_restore_unverified") from None
@@ -78,7 +80,7 @@ class NativeCredentialStore:
             if self.get(device_id, protocol) is None:
                 return
             try:
-                self.backend.delete_password("apple-tv-agent", self.account(device_id, protocol))
+                self.backend.delete_password(self.service, self.account(device_id, protocol))
             except PasswordDeleteError:
                 # Some backends report an already absent credential as an error.
                 if self.get(device_id, protocol) is not None:

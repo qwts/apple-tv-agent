@@ -97,7 +97,7 @@ def main():
                 "import json; from importlib.resources import files; "
                 "root = files('apple_tv_agent'); "
                 "print(json.dumps({name: root.joinpath(name).read_text(encoding='utf-8') "
-                "for name in ['observation-v1.json', 'response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md', 'docs/controls.md', 'docs/troubleshooting.md', 'docs/apps-keyboard.md', 'docs/lg-discovery.md']}))",
+                "for name in ['observation-v1.json', 'response-v1.json', 'docs/registry.md', 'docs/pairing.md', 'docs/sessions.md', 'docs/controls.md', 'docs/troubleshooting.md', 'docs/apps-keyboard.md', 'docs/lg-discovery.md', 'docs/lg-pairing.md', 'observation/lg-manifest.json', 'observation/bscpylgtv-LICENSE.txt']}))",
             ],
             check=True,
             capture_output=True,
@@ -118,9 +118,15 @@ def main():
             "docs/troubleshooting.md",
             "docs/apps-keyboard.md",
             "docs/lg-discovery.md",
+            "docs/lg-pairing.md",
         ):
             if resources[guide] != (root / guide).read_text(encoding="utf-8"):
                 raise RuntimeError("Bundled recovery guide differs from the source.")
+        for name in ("lg-manifest.json", "bscpylgtv-LICENSE.txt"):
+            if resources[f"observation/{name}"] != (
+                root / "src/apple_tv_agent/observation" / name
+            ).read_text(encoding="utf-8"):
+                raise RuntimeError("Bundled LG manifest/license differs from source.")
         exported = base / "exported skills" / "apple-tv-control"
         subprocess.run(
             [

@@ -1,6 +1,6 @@
 # Optional screen observation contract
 
-Issue [22](https://github.com/qwts/apple-tv-agent/issues/22), prerequisite for [18](https://github.com/qwts/apple-tv-agent/issues/18). This change defines models and a provider interface only. There is no production LG discovery, pairing or capture command yet. The baseline Apple TV CLI and response-v1 schema remain unchanged; importing the observation package performs no network or vault access and requires no new dependencies.
+Issue [22](https://github.com/qwts/apple-tv-agent/issues/22), prerequisite for [18](https://github.com/qwts/apple-tv-agent/issues/18). The contract defines models and a provider interface. Experimental [LG discovery](lg-discovery.md) and [trusted pairing](lg-pairing.md) are implemented; capture remains unimplemented. The baseline Apple TV CLI and response-v1 schema remain unchanged; importing the observation package performs no network or vault access and requires no new dependencies.
 
 ## Contract
 
